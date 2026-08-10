@@ -6,8 +6,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 
-first_data_batch = pd.read_csv('dataset/SPECTF.test')
-second_data_batch = pd.read_csv('dataset/SPECTF.train')
+first_data_batch = pd.read_csv('data/raw/SPECTF.test')
+second_data_batch = pd.read_csv('data/raw/SPECTF.train')
 dataset = pd.DataFrame.join(first_data_batch, second_data_batch)
 
 
@@ -26,5 +26,6 @@ X_train = rfe.fit_transform(X_train, y_train)
 X_test = rfe.transform(X_test)
 
 
-regressor = LogisticRegression(random_state=42).fit(X_train, y_train)
+regressor = LogisticRegression(random_state=42)
+regressor.fit(X_train, y_train)
 
