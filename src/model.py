@@ -12,7 +12,7 @@ class Classifier:
         if self.model_name == 'LogisticRegression':
             classifier = LogisticRegression(**params)
 
-        elif self.model_name == 'RandomForest':
+        elif self.model_name == 'RandomForestClassifier':
             classifier = RandomForestClassifier(**params)
 
         elif self.model_name == 'NaiveBayes':
