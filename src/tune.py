@@ -2,6 +2,8 @@ import optuna
 from sklearn.model_selection import cross_val_score, StratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from mlflow_config import setup_mlflow, log_trial
+import mlflow
 
 from model import Classifier
 
@@ -86,10 +88,29 @@ def objective(trial, X_train, y_train, model_name):
         n_jobs=-1
     )
 
-    return scores.mean()
+    std = cross_val_score(
+        pipeline,
+        X_train,
+        y_train,
+        cv=cv,
+        scoring="std",
+        n_jobs=-1)
+    f1_mean = scores.mean()
+
+    with mlflow.start_run(
+            run_name=f"{model_name}_trial_{trial.number}"
+    ):
+
+        log_trial(model_name, params, trial.number, f1_mean, std.mean())
+
+    return f1_mean
 
 
 def tune_model(X_train, y_train, model_name, n_trials=100):
+
+    experiment_name = f'{model_name}_optimization'
+
+    setup_mlflow(experiment_name)
 
     study = optuna.create_study(
         direction="maximize"
@@ -105,4 +126,34 @@ def tune_model(X_train, y_train, model_name, n_trials=100):
         n_trials=n_trials
     )
 
+    log_best_trial(study, model_name)
+
     return study
+
+
+def log_best_trial(study, model_name):
+
+    with mlflow.start_run(
+        run_name=f"{model_name}_BEST"
+    ):
+
+        mlflow.log_param(
+            "model",
+            model_name
+        )
+
+        mlflow.log_param(
+            "best_trial",
+            study.best_trial.number
+        )
+
+        for parameter, value in study.best_params.items():
+            mlflow.log_param(
+                parameter,
+                value
+            )
+
+        mlflow.log_metric(
+            "best_cv_f1",
+            study.best_value
+        )
