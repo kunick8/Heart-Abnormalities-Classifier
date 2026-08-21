@@ -61,13 +61,10 @@ class DataPreprocessing:
     def get_preprocessed_not_scaled_data(self):
         X, y = self.data_splitter()
         X_train, X_test, y_train, y_test = self.training_test_split(X, y)
-        X_train, X_test, scaler = self.feature_scaling(X_train, X_test)
         X_train, X_test, selector = self.feature_selection(X_train, X_test, y_train)
-        X_train, X_test, =scaler.inverse_transform(X_train), scaler.inverse_transform(X_test)
         return (X_train,
                 X_test,
                 y_train,
                 y_test,
-                scaler,
                 selector)
 

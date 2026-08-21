@@ -88,20 +88,13 @@ def objective(trial, X_train, y_train, model_name):
         n_jobs=-1
     )
 
-    std = cross_val_score(
-        pipeline,
-        X_train,
-        y_train,
-        cv=cv,
-        scoring="std",
-        n_jobs=-1)
     f1_mean = scores.mean()
 
     with mlflow.start_run(
             run_name=f"{model_name}_trial_{trial.number}"
     ):
 
-        log_trial(model_name, params, trial.number, f1_mean, std.mean())
+        log_trial(model_name, params, trial.number, f1_mean, scores.std())
 
     return f1_mean
 
