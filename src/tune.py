@@ -4,6 +4,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from mlflow_config import setup_mlflow, log_trial
 import mlflow
+import numpy as np
 
 from model import Classifier
 
@@ -12,14 +13,14 @@ def objective(trial, X_train, y_train, model_name):
         params = {}
         solver = trial.suggest_categorical("solver", [ "lbfgs", "liblinear"])
         params['C'] = trial.suggest_float("C", 1e-3, 100, log=True)
-        params['max_iter'] = 1000
+        params['max_iter'] = 2000
         params['random_state'] = 42
         params['class_weight'] = 'balanced'
         params["solver"] = solver
         if solver == "liblinear":
             params['penalty'] = trial.suggest_categorical("penalty_liblinear", [ "l1", "l2"])
         else:
-            params['penalty'] = trial.suggest_categorical("penalty_lbfgs", ['l2', "none"])
+            params['penalty'] = trial.suggest_categorical("penalty_lbfgs", ['l2', None])
 
     elif model_name == "RandomForestClassifier":
         params = {"n_estimators": trial.suggest_int("n_estimators", 100, 1000),
@@ -31,8 +32,7 @@ def objective(trial, X_train, y_train, model_name):
                   }
 
     elif model_name == "NaiveBayes":
-        params = {'var_smoothing': trial.suggest_float("var_smoothing", 1e-9, 1e-3, log=True),
-                  'random_state': 42,}
+        params = {'var_smoothing': trial.suggest_float("var_smoothing", 1e-9, 1e-3, log=True)}
 
 
     elif model_name == "XGBClassifier":
@@ -40,7 +40,7 @@ def objective(trial, X_train, y_train, model_name):
                   'n_estimators': trial.suggest_int("n_estimators", 100, 200),
                   'max_depth': trial.suggest_int("max_depth", 3, 7),
                   'min_child_weight': trial.suggest_int("min_child_weight", 1, 5),
-                  'scale_pos_weight': y_train.value_counts()[0]/y_train.value_counts()[1],
+                  'scale_pos_weight': (np.count_nonzero(y_train == 0))/(np.count_nonzero(y_train == 1)),
                   'random_state': 42,
                   }
     elif model_name == 'SVC':
@@ -54,7 +54,7 @@ def objective(trial, X_train, y_train, model_name):
         raise ValueError("Invalid model name")
 
     classifier = Classifier(model_name)
-    model = classifier.create_model(**params)
+    model = classifier.create_model(params)
 
     if model_name in [
         "LogisticRegression",
