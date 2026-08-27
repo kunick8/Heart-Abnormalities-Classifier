@@ -7,6 +7,7 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    "tensorflow (==2.21.0)"
 ]
 
 

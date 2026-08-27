@@ -1,0 +1,123 @@
+import optuna
+import tensorflow as tf
+import mlflow
+from mlflow_config import setup_mlflow, log_trial
+from optuna.integration import TFKerasPruningCallback
+from model import NeuralNetwork
+from src.mlflow_config import log_ann_trial
+
+
+def objective(trial, X_train, y_train, X_test, y_test):
+
+    tf.keras.backend.clear_session()
+
+    with mlflow.start_run(
+        run_name=f"ANN_trial_{trial.number}"
+    ):
+
+        n_layers = trial.suggest_int("n_layers", 1, 5)
+        learning_rate = trial.suggest_float('learning_rate', 1e-4, 1e-2, log = True)
+
+        network = NeuralNetwork()
+
+        layer_params = {}
+
+        for i in range(n_layers):
+            if i != 0:
+                num_hidden = trial.suggest_int(f"{i}_layer_neurons", 6, 128)
+                activation = trial.suggest_categorical(f"{i}_layer_activation", ["relu", "tanh"])
+            else:
+                num_hidden = 44
+                activation = trial.suggest_categorical(f"{i}_layer_activation", ["relu", "tanh",])
+            layer_params[f"{i}_layer_activation"] = activation
+            layer_params[f"{i}_layer_neurons"] = num_hidden
+
+            network.model.add_dense_layer(units = num_hidden, activation=activation)
+
+
+        network.model.add_dense_layer(units = 1, activation= 'sigmoid')
+
+        optimizer = trial.suggest_categorical("optimizer", ["sgd", "adam"])
+        batch_size = trial.suggest_categorical(
+            "batch_size",
+            [16, 32, 64, 128]
+        )
+        params = {'n_layers': n_layers, 'learning_rate': learning_rate, 'batch_size': batch_size, 'optimizer': optimizer}
+        if optimizer == "sgd":
+            optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate)
+
+        else:
+            optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+
+        compile_params = {'optimizer':optimizer}
+        network.compile(compile_params)
+
+        callbacks = [
+
+            tf.keras.callbacks.EarlyStopping(
+                monitor="val_loss",
+                patience=3,
+                restore_best_weights=True
+            ),
+
+            TFKerasPruningCallback(
+                trial,
+                "val_accuracy"
+            )
+        ]
+
+        history = network.fit(
+        X_train,
+        y_train,
+        validation_data=(X_test,y_test),
+        batch_size=batch_size,
+        callbacks=callbacks,
+        epochs=20
+        )
+        best_val_accuracy = max(history.history['val_accuracy'])
+        best_val_loss = min(history.history['val_loss'])
+        metrics ={'best_val_accuracy': best_val_accuracy, 'best_val_loss': best_val_loss}
+
+        for i in range(n_layers):
+            params[f'{i}_layer_activation'] = trial.params[f'{i}_layer_activation']
+            params[f'{i}_layer_neurons'] = trial.params[f'{i}_layer_neurons']
+
+        log_ann_trial(params = params, metrics = metrics, trial_number=trial.number)
+
+
+    return best_val_accuracy
+
+def tune_ann(
+    X_train,
+    y_train,
+    X_test,
+    y_test,
+    n_trials=100
+):
+    setup_mlflow(experiment_name="ANN_optimization")
+    study = optuna.create_study(direction="maximize", study_name="ANN_optimization")
+
+    study.optimize(lambda trial: objective(trial, X_train, y_train, X_test, y_test), n_trials=n_trials)
+
+    best_trial = study.best_trial
+
+    with mlflow.start_run(
+            run_name="ANN_BEST_TRIAL"
+    ):
+        mlflow.log_param(
+            "model",
+            "ANN"
+        )
+
+        mlflow.log_param(
+            "best_trial_number",
+            best_trial.number
+        )
+        log_ann_trial(params = best_trial.params, metrics = best_trial.value, trial_number = best_trial.number)
+
+        mlflow.set_tag(
+            "run_type",
+            "best_trial"
+        )
+
+    return study

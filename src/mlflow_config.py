@@ -11,3 +11,11 @@ def log_trial(model_name, params, trial_number, score, score_std):
         mlflow.log_param(parameter, value)
     mlflow.log_metric('mean_cv_f1', score)
     mlflow.log_metric('mean_std_f1', score_std)
+
+def log_ann_trial(model_name, params, trial_number, metrics):
+    mlflow.log_param('params', trial_number)
+    for parameter, value in params.items():
+        mlflow.log_param(parameter, value)
+    for metric, value in metrics.items():
+        mlflow.log_metric(metric, value)
+

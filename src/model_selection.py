@@ -12,5 +12,5 @@ models = ["LogisticRegression", "RandomForestClassifier", "NaiveBayes", "XGBClas
 Preprocessor = DataPreprocessing(dataset)
 preprocessed_data = Preprocessor.get_preprocessed_not_scaled_data()
 
-
-tune_model(model_name="SVC", X_train = preprocessed_data[0], y_train = preprocessed_data[2])
+for model in models:
+    tune_model(model_name=model, X_train = preprocessed_data[0], y_train = preprocessed_data[2])
