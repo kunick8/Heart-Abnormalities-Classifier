@@ -1,12 +1,14 @@
-from src.model import Classifier, NeuralNetwork
-from sklearn.linear_model import LogisticRegression
+import numpy as np
+import pytest
+import tensorflow as tf
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
-import pytest
-import tensorflow as tf
-import numpy as np
+
+from src.model import Classifier, NeuralNetwork
+
 
 def test_logistic_regression_creation():
 
@@ -137,7 +139,7 @@ def test_output_layer():
     assert model.layers[-1].units == 1
     assert model.layers[-1].activation.__name__ == "sigmoid"
 
-def test__neural_network_compile():
+def test_neural_network_compile():
     nn = NeuralNetwork(32)
 
     params = {
@@ -160,6 +162,7 @@ def test__neural_network_compile():
     assert model.loss == 'binary_crossentropy'
 
 def test_neural_network_fit():
+    np.random.seed(42)
     X = np.random.rand(20, 5)
 
     y = np.array(

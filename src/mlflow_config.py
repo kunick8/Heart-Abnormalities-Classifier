@@ -1,6 +1,7 @@
 import mlflow
 from mlflow import MlflowClient
 
+
 def setup_mlflow(experiment_name):
     mlflow.set_tracking_uri("http://localhost:5000")
     mlflow.set_experiment(experiment_name)
@@ -35,11 +36,15 @@ def get_best_run(tracking_uri, experiment_name):
             f"Experiment '{experiment_name}' not found"
         )
 
-    best_run = client.search_runs(
+    runs = client.search_runs(
         experiment_ids=[experiment.experiment_id],
         order_by=["metrics.mean_cv_f1 DESC"],
         max_results=1
-    )[0]
+    )
+    if not runs:
+        raise ValueError(f'Experiment "{experiment_name}" contains no runs')
+
+    best_run = runs[0]
 
     return best_run
 
@@ -60,6 +65,7 @@ def get_best_params(
 def get_converted_params(tracking_uri, experiment_name):
 
     params = get_best_params(tracking_uri, experiment_name)
+    params = params.copy()
 
     if params['model'] == 'LogisticRegression':
         params['max_iter'] = int(params['max_iter'])
@@ -84,5 +90,7 @@ def get_converted_params(tracking_uri, experiment_name):
     elif params['model'] == 'SVC':
         params['C'] = float(params['C'])
         params['gamma'] = float(params['gamma'])
+
+    params.pop('model', None)
 
     return params

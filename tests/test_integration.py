@@ -1,7 +1,9 @@
+import numpy as np
 import pandas as pd
-from src.model import Classifier, NeuralNetwork
-from src.data.data_preprocessing import DataPreprocessing
 import tensorflow as tf
+
+from src.data.data_preprocessing import DataPreprocessing
+from src.model import Classifier, NeuralNetwork
 
 
 def test_preprocessing_and_model():
@@ -14,7 +16,7 @@ def test_preprocessing_and_model():
 
     preprocessing = DataPreprocessing(data)
 
-    X_train, X_test, y_train, y_test, scaler, selector = preprocessing.get_preprocessed_data()
+    X_train, X_test, y_train, y_test, _, _ = preprocessing.get_preprocessed_data()
 
     classifier = Classifier(
         "LogisticRegression"
@@ -31,6 +33,7 @@ def test_preprocessing_and_model():
     predictions = model.predict(X_test)
 
     assert len(predictions) == len(y_test)
+    assert set(predictions).issubset({0, 1})
 
 
 
@@ -43,7 +46,7 @@ def test_preprocessing_and_ann():
 
     preprocessing = DataPreprocessing(data)
 
-    X_train, X_test, y_train, y_test, scaler, selector = preprocessing.get_preprocessed_data()
+    X_train, X_test, y_train, y_test, _, _ = preprocessing.get_preprocessed_data()
 
     network = NeuralNetwork(X_train.shape[1])
 
@@ -62,7 +65,7 @@ def test_preprocessing_and_ann():
     optimizer_params = {'optimizer': optimizer}
     network.compile(optimizer_params)
 
-    history = network.fit(
+    network.fit(
         X_train,
         y_train,
         validation_data=(X_test, y_test),
@@ -73,3 +76,5 @@ def test_preprocessing_and_ann():
     y_pred = model.predict(X_test)
 
     assert len(y_pred) == len(y_test)
+    assert y_pred.shape == (len(y_test), 1)
+    assert np.all((y_pred >= 0) & (y_pred <= 1))

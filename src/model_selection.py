@@ -1,6 +1,6 @@
-from src.data.data_preprocessing import DataPreprocessing
 from src.data.data_cleaning import join_data
 from src.data.data_extractor import extract_data
+from src.data.data_preprocessing import DataPreprocessing
 from src.tune import tune_model
 
 dataset1 = extract_data('../data/raw/SPECTF.test')

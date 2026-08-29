@@ -1,7 +1,7 @@
-from src.data.data_preprocessing import DataPreprocessing
+from src.ann_tuning import tune_ann
 from src.data.data_cleaning import join_data
 from src.data.data_extractor import extract_data
-from src.ann_tuning import tune_ann
+from src.data.data_preprocessing import DataPreprocessing
 
 dataset1 = extract_data('../data/raw/SPECTF.test')
 dataset2 = extract_data('../data/raw/SPECTF.train')

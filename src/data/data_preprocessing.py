@@ -1,9 +1,8 @@
-import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import RFECV
 from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 
 class DataPreprocessing:
@@ -16,11 +15,11 @@ class DataPreprocessing:
         y = self.dataset.iloc[:, 0].values
         return X, y
 
-    def training_test_split(self, X, y):
+    def training_test_split(self, X, y, test_size=0.3):
         return train_test_split(
             X,
             y,
-            test_size=0.3,
+            test_size=test_size,
             random_state=42
         )
 

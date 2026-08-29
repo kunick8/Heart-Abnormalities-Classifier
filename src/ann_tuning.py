@@ -1,10 +1,10 @@
+import mlflow
 import optuna
 import tensorflow as tf
-import mlflow
-from src.mlflow_config import setup_mlflow, log_ann_trial
 from optuna_integration import TFKerasPruningCallback
-from src.model import NeuralNetwork
 
+from src.mlflow_config import log_ann_trial, setup_mlflow
+from src.model import NeuralNetwork
 
 
 def objective(trial, X_train, y_train, X_test, y_test):

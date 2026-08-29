@@ -1,8 +1,10 @@
-from src.data.data_preprocessing import DataPreprocessing
-import pandas as pd
 import numpy as np
-from src.data.data_cleaning import join_data
+import pandas as pd
 from sklearn.feature_selection import RFECV
+
+from src.data.data_cleaning import join_data
+from src.data.data_preprocessing import DataPreprocessing
+
 
 def test_data_splitter():
     data = pd.DataFrame({
@@ -31,7 +33,7 @@ def test_train_test_split():
     preprocessor = DataPreprocessing(data)
     X, y = preprocessor.data_splitter()
 
-    X_train, X_test, y_train, y_test = preprocessor.training_test_split(X,y)
+    X_train, X_test, y_train, y_test = preprocessor.training_test_split(X,y, test_size=0.3)
 
     assert len(X_train) == 7
     assert len(X_test) == 3
@@ -49,9 +51,9 @@ def test_feature_scaling():
     preprocessor = DataPreprocessing(data)
     X, y = preprocessor.data_splitter()
 
-    X_train, X_test, y_train, y_test = preprocessor.training_test_split(X, y)
+    X_train, X_test, _, _ = preprocessor.training_test_split(X, y)
 
-    X_train, X_test, scaler = preprocessor.feature_scaling(X_train, X_test)
+    X_train, X_test, _ = preprocessor.feature_scaling(X_train, X_test)
 
     assert np.allclose(
         X_train.mean(axis=0),
@@ -75,9 +77,9 @@ def test_feature_selection():
     preprocessor = DataPreprocessing(data)
     X, y = preprocessor.data_splitter()
 
-    X_train, X_test, y_train, y_test = preprocessor.training_test_split(X, y)
+    X_train, X_test, y_train, _ = preprocessor.training_test_split(X, y)
 
-    X_train, X_test, scaler = preprocessor.feature_scaling(X_train, X_test)
+    X_train, X_test, _ = preprocessor.feature_scaling(X_train, X_test)
 
     X_train_sel, X_test_sel, selector = preprocessor.feature_selection(X_train, X_test, y_train)
 
@@ -89,6 +91,7 @@ def test_feature_selection():
     assert X_train_sel.shape[1] <= X_train.shape[1]
 
     assert isinstance(selector, RFECV)
+    assert hasattr(selector, "support_")
 
 
 
@@ -108,3 +111,11 @@ def test_data_cleaning():
     data3 = join_data(data, data2)
 
     assert data3.shape == (8, 3)
+    assert list(data3.columns) == [
+        "target",
+        "feature_1",
+        "feature_2"
+    ]
+    assert len(data3) == len(data) + len(data2)
+
+

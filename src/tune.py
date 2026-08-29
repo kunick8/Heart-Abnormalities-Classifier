@@ -1,12 +1,13 @@
-import optuna
-from sklearn.model_selection import cross_val_score, StratifiedKFold
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-from mlflow_config import setup_mlflow, log_trial
 import mlflow
 import numpy as np
+import optuna
+from sklearn.model_selection import StratifiedKFold, cross_val_score
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
+from mlflow_config import log_trial, setup_mlflow
 from model import Classifier
+
 
 def objective(trial, X_train, y_train, model_name):
     if model_name == "LogisticRegression":
