@@ -1,6 +1,13 @@
+import os
+import sys
+
 import numpy as np
 import pandas as pd
 from sklearn.feature_selection import RFECV
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
+sys.path.insert(0, parent_dir)
 
 from src.data.data_cleaning import join_data
 from src.data.data_preprocessing import DataPreprocessing
@@ -69,9 +76,9 @@ def test_feature_scaling():
 
 def test_feature_selection():
     data = pd.DataFrame({
-        "target": [0, 1] * 5,
-        'feature_1': range(10),
-        'feature_2': range(10, 20)
+        "target": [0, 1] * 20,
+        'feature_1': range(40),
+        'feature_2': range(40, 80)
     })
 
     preprocessor = DataPreprocessing(data)
