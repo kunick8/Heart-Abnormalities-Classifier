@@ -1,1 +1,1 @@
-'tests for data preprocessing, mlflow, integration in the pipeline and the model creation'
+"""Tests for data preprocessing, mlflow, integration in the pipeline and the model creation"""
