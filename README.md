@@ -32,3 +32,9 @@ I've also created an ANN based on the Keras framework, i've used 100 trial optun
 to train 100-epoch models, the best accuracy I've achieved was 84%.
 Such accuracy in the most optimistic scenario would amount to an F1 score of 0.91.
 Thus I've decided to use SVC for the final model.
+
+## File structure
+
+## How to run the project
+
+## wnioski i interpretacja po ang xd

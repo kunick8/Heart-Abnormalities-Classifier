@@ -94,3 +94,11 @@ def get_converted_params(tracking_uri, experiment_name):
     params.pop('model', None)
 
     return params
+
+def get_best_score_per_model(tracking_uri, experiment_names:set):
+    score_per_model = {}
+    for experiment in experiment_names:
+        params = get_best_params(tracking_uri, experiment)
+        model=params['model']
+        score_per_model[model] = float(params['mean_cv_f1'])
+    return score_per_model
