@@ -1,12 +1,6 @@
-import os
-import sys
 from unittest.mock import MagicMock, patch
 
 import pytest
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
-sys.path.insert(0, parent_dir)
 
 from src.mlflow_config import (
     get_best_params,

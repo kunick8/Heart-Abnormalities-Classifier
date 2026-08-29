@@ -1,0 +1,1 @@
+'Classification model for heart abnormalities prediction from SPECT images'

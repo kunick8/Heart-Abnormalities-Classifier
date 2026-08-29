@@ -1,6 +1,3 @@
-import os
-import sys
-
 import numpy as np
 import pytest
 import tensorflow as tf
@@ -9,10 +6,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
-sys.path.insert(0, parent_dir)
 
 from src.model import Classifier, NeuralNetwork
 
