@@ -1,18 +1,14 @@
 from src.data.data_preprocessing import DataPreprocessing
 from src.data.data_cleaning import join_data
 from src.data.data_extractor import extract_data
-from src.model import Classifier
+from src.ann_tuning import tune_ann
 
 dataset1 = extract_data('../data/raw/SPECTF.test')
 dataset2 = extract_data('../data/raw/SPECTF.train')
 dataset = join_data(dataset1, dataset2)
 
-
 Preprocessor = DataPreprocessing(dataset)
 preprocessed_data = Preprocessor.get_preprocessed_data()
-classifier = Classifier('SVC')
-model = classifier.create_best_model(tracking_uri="http://localhost:5000")
 
-model.fit(preprocessed_data[0], preprocessed_data[2])
-y_pred = model.predict(preprocessed_data[1])
 
+tune_ann(preprocessed_data[0], preprocessed_data[2], preprocessed_data[1], preprocessed_data[3])

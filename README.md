@@ -1,7 +1,7 @@
 # Heart imagery abnormalities classifier
 ## Quick overhaul
 This project's objective is to create a highly accurate classifier for detecting abnormalities in heart imagery
-from patterns created from Single Proton Emission Computed Tomography (SPECT) images. My personal biggest goal with this project is to learn how to properly structure ML projects, how to build proper pipelines and how to use optuna and MLflow.
+from patterns created from Single Proton Emission Computed Tomography (SPECT) images. My personal goal with this project is to learn how to properly structure ML projects, how to build proper pipelines and how to use optuna and MLflow.
 
 
 ## Dataset
@@ -22,8 +22,13 @@ I've used f1 score rather than accuracy because the classes are highly imbalance
 
 | Model                    | Best F1 score |
 |--------------------------|---------------|
-| Logistic regression      | 0.86          |
+| Logistic regression      | 0.87          |
 | Random Forest Classifier | 0.9           | 
 | GaussianNB               | 0.84          |
 | XGB Classifier           | 0.88          |
 | SVC                      | 0.92          |
+
+I've also created an ANN based on the Keras framework, i've used 100 trial optuna tuning
+to train 100-epoch models, the best accuracy I've achieved was 84%.
+Such accuracy in the most optimistic scenario would amount to an F1 score of 0.91.
+Thus I've decided to use SVC for the final model.
