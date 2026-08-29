@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Poetry
+poetry.toml
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDEs
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Environment variables / secrets
+.env
+.env.*
+
+# ML / experiment artifacts
+mlruns/
+mlartifacts/
+
+# Generated models
+*.pkl
+*.joblib
+*.h5
+*.keras
+*.onnx
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Build / distribution
+dist/
+build/
+*.egg-info/
+
+# Streamlit
+.streamlit/secrets.toml

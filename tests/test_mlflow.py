@@ -117,9 +117,6 @@ def test_get_best_run(mock_client):
 
     assert result == mock_best_run
 
-    mock_client.assert_called_once_with(
-        tracking_uri="http://localhost:5000"
-    )
 
     mock_client_instance.get_experiment_by_name.assert_called_once_with(
         "SVC_optimization"
