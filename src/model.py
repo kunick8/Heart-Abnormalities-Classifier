@@ -31,45 +31,6 @@ class Classifier:
         return classifier
 
 
-    def create_best_model(self, tracking_uri):
-
-        client = MlflowClient(tracking_uri=tracking_uri)
-        experiment_name = f'{self.model_name}_optimization'
-        experiment = client.get_experiment_by_name(experiment_name)
-
-        best_run = client.search_runs(
-            experiment_ids = [experiment.experiment_id],
-            order_by = ['metrics.mean_cv_f1 DESC'],
-            max_results=1
-        )[0]
-        params = best_run.data.params
-
-        if params['model'] == 'LogisticRegression':
-            params['max_iter'] = int(params['max_iter'])
-            params['C'] = float(params['C'])
-            params['random_state'] = int(params['random_state'])
-
-        elif params['model'] == 'RandomForestClassifier':
-            params["n_estimators"] = int(params['n_estimators'])
-            params['max_depth'] = int(params['max_depth'])
-            params['min_samples_split'] = int(params['min_samples_split'])
-
-        elif params['model'] == 'NaiveBayes':
-            params['var_smoothing'] = float(params['var_smoothing'])
-
-        elif params['model'] == 'XGBClassifier':
-            params['n_estimators'] = int(params['n_estimators'])
-            params['max_depth'] = int(params['max_depth'])
-            params['min_samples_split'] = float(params['min_samples_split'])
-            params['scale_pos_weight'] = float(params['scale_pos_weight'])
-            params['learning_rate'] = float(params['learning_rate'])
-
-        elif params['model'] == 'SVC':
-            params['C'] = float(params['C'])
-            params['gamma'] = float(params['gamma'])
-            params['random_state'] = int(params['random_state'])
-
-        return self.create_model(self, params=params)
 
 
 class NeuralNetwork:
