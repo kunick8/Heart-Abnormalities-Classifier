@@ -1,5 +1,5 @@
-import streamlit as st
 import numpy as np
+import streamlit as st
 
 from src.predict import predict
 
@@ -17,7 +17,7 @@ st.write(
     '''
 )
 
-st.header(f'Make a prediction')
+st.header('Make a prediction')
 st.write(
     """
     Enter the patient's feature values below.

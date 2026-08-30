@@ -90,8 +90,11 @@ def get_converted_params(tracking_uri, experiment_name):
     elif params['model'] == 'SVC':
         params['C'] = float(params['C'])
         params['gamma'] = float(params['gamma'])
+        params['random_state'] = int(params['random_state'])
 
     params.pop('model', None)
+    params.pop('params', None)
+
 
     return params
 

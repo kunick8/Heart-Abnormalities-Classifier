@@ -2,7 +2,6 @@ import joblib
 import numpy as np
 
 
-
 def predict(data:np.ndarray):
     model = joblib.load('artifacts/model/svc.joblib')
     scaler = joblib.load('artifacts/model/scaler.joblib')

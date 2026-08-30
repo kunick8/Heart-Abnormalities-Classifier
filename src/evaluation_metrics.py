@@ -1,33 +1,32 @@
-import mlflow
-import os
 import json
+import os
+from pathlib import Path
 
+import mlflow
 from sklearn.metrics import (
     accuracy_score,
+    confusion_matrix,
     f1_score,
     precision_score,
     recall_score,
     roc_auc_score,
-    confusion_matrix,
 )
-from src.visualization.charts import (
-plot_roc_curve,
-visualize_confusion_matrix,
-plot_pr_curve,
-plot_class_pie,
-plot_model_comparison
-)
+
 from src.mlflow_config import get_best_score_per_model
-
-
-from src.visualization.optuna_charts import (
-plot_param_importances,
-plot_optimization_history,
-plot_parallel_coordinate
+from src.visualization.charts import (
+    plot_class_pie,
+    plot_model_comparison,
+    plot_pr_curve,
+    plot_roc_curve,
+    visualize_confusion_matrix,
 )
 
 
 def evaluate_model(y_test, y_pred):
+    project_root = Path(__file__).parent.parent
+    metrics_path = project_root / "artifacts" / "model" / "metrics.json"
+    metrics_path.parent.mkdir(parents=True, exist_ok=True)
+
     metrics = {
     'accuracy': accuracy_score(y_test, y_pred),
     'precision': precision_score(y_test, y_pred),
@@ -36,7 +35,7 @@ def evaluate_model(y_test, y_pred):
     'roc_auc_score': roc_auc_score(y_test, y_pred)
     }
 
-    with open("artifacts/model/metrics.json", "w") as f:
+    with open(metrics_path, "w") as f:
         json.dump(metrics, f, indent=4)
 
     return metrics
@@ -77,7 +76,9 @@ def plot_charts(X_test, y_test, y_pred, model):
 def save_and_log_charts(X_test, y_test, y_pred, model):
     results = plot_charts(X_test, y_test, y_pred, model)
 
-    os.makedirs("artifacts/charts", exist_ok=True)
+    project_root = Path(__file__).parent.parent
+    charts_dir = project_root / "artifacts" / "charts"
+    charts_dir.mkdir(parents=True, exist_ok=True)
 
     charts = {
         "confusion_matrix": results["cm_fig"],
@@ -88,7 +89,7 @@ def save_and_log_charts(X_test, y_test, y_pred, model):
     }
 
     for name, fig in charts.items():
-        path = f"artifacts/charts/{name}.png"
+        path = charts_dir /f"{name}.png"
 
         fig.savefig(
             path,
@@ -96,6 +97,5 @@ def save_and_log_charts(X_test, y_test, y_pred, model):
             bbox_inches="tight"
         )
 
-        mlflow.log_artifact(path)
+        mlflow.log_artifact(str(path), artifact_path="charts")
 
-    return

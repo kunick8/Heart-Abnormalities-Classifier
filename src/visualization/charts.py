@@ -1,12 +1,13 @@
 import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
+import seaborn as sns
 from sklearn.metrics import (
-    roc_curve,
-    roc_auc_score,
+    average_precision_score,
     precision_recall_curve,
-    average_precision_score
+    roc_auc_score,
+    roc_curve,
 )
+
 
 #cm refers to confusion matrix
 def visualize_confusion_matrix(cm):

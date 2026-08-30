@@ -1,5 +1,10 @@
-import streamlit as st
 import json
+from pathlib import Path
+import streamlit as st
+
+project_root = Path(__file__).parent.parent
+metrics_path = project_root / "artifacts" / "model" / "metrics.json"
+charts_path = project_root / "artifacts" / "charts"
 
 st.set_page_config(
     page_title="Heart Abnormalities Classifier",
@@ -15,7 +20,7 @@ st.write(
     """
 )
 
-with open("metrics.json", "r") as f:
+with open(metrics_path, "r") as f:
     metrics = json.load(f)
 
 st.header("Model Performance")
@@ -32,7 +37,7 @@ col5.metric("Roc-auc", f"{metrics['roc_auc_score']:.3f}")
 st.divider()
 
 st.image(
-    "artifacts/charts/model_comparison.png",
+    str(charts_path / 'model_comparison.png'),
     caption="Model Comparison"
 )
 
@@ -44,7 +49,7 @@ st.divider()
 
 
 st.image(
-    "artifacts/charts/confusion_matrix.png",
+    str(charts_path / 'confusion_matrix.png'),
     caption="Confusion Matrix"
 )
 
@@ -55,7 +60,7 @@ st.write()
 st.divider()
 
 st.image(
-    "artifacts/charts/roc_curve.png",
+    str(charts_path / 'roc_curve.png'),
     caption="ROC Curve"
 )
 
@@ -66,7 +71,7 @@ st.write()
 st.divider()
 
 st.image(
-    "artifacts/charts/precision_recall_curve.png",
+    str(charts_path / 'precision_recall_curve.png'),
     caption="Precision-Recall Curve"
 )
 
