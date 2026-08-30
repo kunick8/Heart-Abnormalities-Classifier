@@ -1,3 +1,5 @@
+import joblib
+
 from src.data.data_cleaning import join_data
 from src.data.data_extractor import extract_data
 from src.data.data_preprocessing import DataPreprocessing
@@ -22,6 +24,10 @@ classifier = Classifier('SVC')
 model = classifier.create_model(params)
 
 model.fit(X_train, y_train)
+
+joblib.dump(model, 'artifacts/model/svc.joblib')
+joblib.dump(scaler, 'artifacts/model/scaler.joblib')
+joblib.dump(selector, 'artifacts/model/selector.joblib')
 
 y_pred = model.predict(X_test)
 

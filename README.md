@@ -1,7 +1,7 @@
 # Heart imagery abnormalities classifier
 ## Quick overhaul
 This project's objective is to create a highly accurate classifier for detecting abnormalities in heart imagery
-from patterns created from Single Proton Emission Computed Tomography (SPECT) images. My personal goal with this project is to learn how to properly structure ML projects, how to build proper pipelines and how to use optuna and MLflow.
+from patterns created from Single Proton Emission Computed Tomography (SPECT) images. My personal goal with this project is to learn how to properly structure ML projects, build proper pipelines and how to use optuna, streamlit and MLflow.
 
 
 ## Dataset
@@ -13,7 +13,7 @@ K- fold cross validation algorithm.
 
 
 ## Structure 
-data extraction -> data cleaning -> train test split -> feature scailing -> feature elimination -> classification -> kfold to choose model -> model to choose hyperparameters -> deployment
+data extraction -> data cleaning -> train test split -> feature scaling -> feature elimination -> classification -> kfold to choose model -> model to choose hyperparameters -> deployment
 
 
 ## Model Selection

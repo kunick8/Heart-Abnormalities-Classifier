@@ -1,5 +1,6 @@
 import mlflow
 import os
+import json
 
 from sklearn.metrics import (
     accuracy_score,
@@ -32,9 +33,12 @@ def evaluate_model(y_test, y_pred):
     'precision': precision_score(y_test, y_pred),
     'recall': recall_score(y_test, y_pred),
     'f1_score': f1_score(y_test, y_pred),
-    'roc_auc_score': roc_auc_score(y_test, y_pred),
-    'cm' : confusion_matrix(y_test, y_pred),
+    'roc_auc_score': roc_auc_score(y_test, y_pred)
     }
+
+    with open("artifacts/model/metrics.json", "w") as f:
+        json.dump(metrics, f, indent=4)
+
     return metrics
 
 
