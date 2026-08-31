@@ -56,14 +56,12 @@ class DataPreprocessing:
             y_test,
             scaler,
             selector)
-
-    def get_preprocessed_not_scaled_data(self):
+    #data for optuna optimizations
+    def get_optimization_data(self):
         X, y = self.data_splitter()
         X_train, X_test, y_train, y_test = self.training_test_split(X, y)
-        X_train, X_test, selector = self.feature_selection(X_train, X_test, y_train)
         return (X_train,
                 X_test,
                 y_train,
-                y_test,
-                selector)
+                y_test,)
 

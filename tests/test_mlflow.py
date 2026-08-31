@@ -23,9 +23,9 @@ def test_log_trial(
     }
     cv_f1 = 0.92
     score_std = 0.3
+    metrics = {'mean_cv_f1': cv_f1, 'mean_std_f1': score_std}
 
-
-    log_trial(model_name, params, trial_number= 10, score = cv_f1, score_std = score_std)
+    log_trial(model_name, params, trial_number= 10, metrics=metrics)
 
     mock_log_param.assert_any_call(
         "model",

@@ -4,6 +4,8 @@ import optuna
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.feature_selection import RFECV
+from sklearn.linear_model import LogisticRegression
 
 from mlflow_config import log_trial, setup_mlflow
 from model import Classifier
@@ -65,12 +67,20 @@ def objective(trial, X_train, y_train, model_name):
 
         pipeline = Pipeline([
             ("scaler", StandardScaler()),
+            ('selector', RFECV(estimator=LogisticRegression(
+                random_state=42,
+                max_iter=1000
+            ))),
             ("classifier", model)
         ])
 
     else:
 
         pipeline = Pipeline([
+            ('selector', RFECV(estimator=LogisticRegression(
+                random_state=42,
+                max_iter=1000
+            ))),
             ("classifier", model)
         ])
 
@@ -90,12 +100,13 @@ def objective(trial, X_train, y_train, model_name):
     )
 
     f1_mean = scores.mean()
+    metrics = {'mean_cv_f1': f1_mean, 'mean_std_f1': scores.std()}
 
     with mlflow.start_run(
             run_name=f"{model_name}_trial_{trial.number}"
     ):
 
-        log_trial(model_name, params, trial.number, f1_mean, scores.std())
+        log_trial(model_name, params, trial.number, metrics)
 
     return f1_mean
 

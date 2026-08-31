@@ -6,13 +6,14 @@ def setup_mlflow(experiment_name):
     mlflow.set_tracking_uri("http://localhost:5000")
     mlflow.set_experiment(experiment_name)
 
-def log_trial(model_name, params, trial_number, score, score_std):
+def log_trial(model_name, params, trial_number, metrics):
     mlflow.log_param('model', model_name)
     mlflow.log_param('trial_number', trial_number)
+
     for parameter, value in params.items():
         mlflow.log_param(parameter, value)
-    mlflow.log_metric('mean_cv_f1', score)
-    mlflow.log_metric('mean_std_f1', score_std)
+    for metric, value in metrics.items():
+        mlflow.log_metric(metric, value)
 
 def log_ann_trial( params, trial_number, metrics):
     mlflow.log_param('trial_number', trial_number)
@@ -93,7 +94,7 @@ def get_converted_params(tracking_uri, experiment_name):
         params['random_state'] = int(params['random_state'])
 
     params.pop('model', None)
-    params.pop('params', None)
+    params.pop('trial_number', None)
 
 
     return params

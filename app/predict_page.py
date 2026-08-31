@@ -1,7 +1,12 @@
 import numpy as np
 import streamlit as st
+import sys
+from pathlib import Path
 
 from src.predict import predict
+
+project_root = Path(__file__).parent.parent
+sys.path.append(str(project_root))
 
 st.set_page_config(
     page_title="Heart Abnormalities Classifier",
