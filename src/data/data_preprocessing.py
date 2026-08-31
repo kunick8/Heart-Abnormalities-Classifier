@@ -1,5 +1,6 @@
 import pandas as pd
-from sklearn.feature_selection import RFECV
+import xgboost as xgb
+from sklearn.feature_selection import RFECV, SelectFromModel
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -45,6 +46,19 @@ class DataPreprocessing:
 
         return X_train, X_test, selector
 
+    def ann_feature_selection(self, X_train, X_test,  y_train):
+
+        xgb_model = xgb.XGBClassifier(n_estimators=100, random_state=42)
+        xgb_model.fit(X_train, y_train)
+
+        selector = SelectFromModel(xgb_model, prefit=True)
+
+        X_train_selected = selector.transform(X_train)
+        X_test_selected = selector.transform(X_test)
+
+        return X_train_selected, X_test_selected, selector
+
+
     def get_preprocessed_data(self):
         X, y = self.data_splitter()
         X_train, X_test, y_train, y_test = self.training_test_split(X, y)
@@ -56,7 +70,7 @@ class DataPreprocessing:
             y_test,
             scaler,
             selector)
-    #data for optuna optimizations
+    #data for ml models optuna optimizations
     def get_optimization_data(self):
         X, y = self.data_splitter()
         X_train, X_test, y_train, y_test = self.training_test_split(X, y)
@@ -65,3 +79,19 @@ class DataPreprocessing:
                 y_train,
                 y_test,)
 
+    def get_ann_optimization_data(self):
+        X, y = self.data_splitter()
+        X_train, X_test, y_train, y_test = self.training_test_split(X, y)
+        X_train, X_val, y_train, y_val = self.training_test_split(X_train, y_train, test_size=0.2)
+        X_train, X_test, scaler = self.feature_scaling(X_train, X_test)
+        X_val = scaler.transform(X_val)
+        X_train, X_test, selector = self.feature_selection(X_train, X_test, y_train)
+        X_val = scaler.transform(X_val)
+        return (X_train,
+                X_test,
+                X_val,
+                y_train,
+                y_test,
+                y_val,
+                scaler,
+                selector)

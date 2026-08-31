@@ -6,10 +6,10 @@ from optuna_integration import TFKerasPruningCallback
 from src.mlflow_config import log_ann_trial, setup_mlflow
 from src.model import NeuralNetwork
 
-
-def objective(trial, X_train, y_train, X_test, y_test):
+def objective(trial, X_train, X_val, y_train, y_val):
 
     tf.keras.backend.clear_session()
+
 
     with mlflow.start_run(
         run_name=f"ANN_trial_{trial.number}"
@@ -69,7 +69,7 @@ def objective(trial, X_train, y_train, X_test, y_test):
         history = network.fit(
         X_train,
         y_train,
-        validation_data=(X_test,y_test),
+        validation_data=(X_val,y_val),
         batch_size=batch_size,
         callbacks=callbacks,
         epochs=100
@@ -87,15 +87,15 @@ def objective(trial, X_train, y_train, X_test, y_test):
 
 def tune_ann(
     X_train,
+    X_val,
     y_train,
-    X_test,
-    y_test,
+    y_val,
     n_trials=100
 ):
     setup_mlflow(experiment_name="ANN_optimization_100epochs")
     study = optuna.create_study(direction="maximize", study_name="ANN_optimization")
 
-    study.optimize(lambda trial: objective(trial, X_train, y_train, X_test, y_test), n_trials=n_trials)
+    study.optimize(lambda trial: objective(trial, X_train, X_val, y_train, y_val), n_trials=n_trials)
 
     best_trial = study.best_trial
 

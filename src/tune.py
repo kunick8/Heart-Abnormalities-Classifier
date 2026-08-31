@@ -4,8 +4,9 @@ import optuna
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.feature_selection import RFECV
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_selection import SelectFromModel
 
 from mlflow_config import log_trial, setup_mlflow
 from model import Classifier
@@ -59,31 +60,25 @@ def objective(trial, X_train, y_train, model_name):
     classifier = Classifier(model_name)
     model = classifier.create_model(params)
 
-    if model_name in [
-        "LogisticRegression",
-        "NaiveBayes",
-        "SVC"
-    ]:
-
-        pipeline = Pipeline([
-            ("scaler", StandardScaler()),
-            ('selector', RFECV(estimator=LogisticRegression(
-                random_state=42,
-                max_iter=1000
-            ))),
-            ("classifier", model)
-        ])
-
+    if model_name in ["RandomForestClassifier", "XGBClassifier"]:
+        selector_estimator = RandomForestClassifier(n_estimators=50, random_state=42, n_jobs=-1)
+        needs_scaling = False
     else:
+        selector_estimator = LogisticRegression(random_state=42, max_iter=1000)
+        needs_scaling = True
 
-        pipeline = Pipeline([
-            ('selector', RFECV(estimator=LogisticRegression(
-                random_state=42,
-                max_iter=1000
-            ))),
-            ("classifier", model)
-        ])
 
+    threshold = trial.suggest_categorical("feature_selection_threshold", ["mean", "median", "1.25*mean"])
+    selector = SelectFromModel(estimator=selector_estimator, threshold=threshold)
+
+    steps = []
+    if needs_scaling:
+        steps.append(("scaler", StandardScaler()))
+
+    steps.append(("selector", selector))
+    steps.append(("classifier", model))
+
+    pipeline = Pipeline(steps)
     cv = StratifiedKFold(
         n_splits=5,
         shuffle=True,
@@ -131,34 +126,6 @@ def tune_model(X_train, y_train, model_name, n_trials=100):
         n_trials=n_trials
     )
 
-    log_best_trial(study, model_name)
-
     return study
 
 
-def log_best_trial(study, model_name):
-
-    with mlflow.start_run(
-        run_name=f"{model_name}_BEST"
-    ):
-
-        mlflow.log_param(
-            "model",
-            model_name
-        )
-
-        mlflow.log_param(
-            "best_trial",
-            study.best_trial.number
-        )
-
-        for parameter, value in study.best_params.items():
-            mlflow.log_param(
-                parameter,
-                value
-            )
-
-        mlflow.log_metric(
-            "best_cv_f1",
-            study.best_value
-        )
