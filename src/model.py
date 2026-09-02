@@ -44,8 +44,11 @@ class NeuralNetwork:
     def compile(self, params:dict):
         self.model.compile(optimizer = params['optimizer'], loss = 'binary_crossentropy', metrics = ['accuracy'])
 
-    def fit(self, X_train, y_train, validation_data, epochs, batch_size, callbacks = None):
+    def fit(self, X_train, y_train, epochs, batch_size, validation_data= None, callbacks = None):
         return self.model.fit(X_train, y_train, validation_data = validation_data, epochs = epochs, batch_size = batch_size, callbacks = callbacks, verbose = 0)
+
+    def predict(self, X_test):
+        return self.model.predict(X_test)
 
     def get_model(self):
         return self.model

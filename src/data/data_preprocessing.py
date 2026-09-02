@@ -8,8 +8,18 @@ from sklearn.preprocessing import StandardScaler
 
 class DataPreprocessing:
 
-    def __init__(self, dataset:pd.DataFrame):
-        self.dataset = dataset
+    def __init__(self, dataset:pd.DataFrame = None, X_train = None, y_train = None, X_test = None, y_test = None):
+        if dataset is not None:
+            self.dataset = dataset
+        if X_train:
+            self.X_train = X_train
+        if y_train:
+            self.y_train = y_train
+        if X_test:
+            self.X_test = X_test
+        if y_test:
+            self.y_test = y_test
+
 
     def data_splitter(self):
         X = self.dataset.iloc[:, 1:].values
@@ -70,7 +80,9 @@ class DataPreprocessing:
             y_test,
             scaler,
             selector)
-    #data for ml models optuna optimizations
+
+    #data for ml models optuna optimizations, it's without feature selection or feature scaling
+    #to prevent data leakage(optuna pipelines use k-fold for optimization)
     def get_optimization_data(self):
         X, y = self.data_splitter()
         X_train, X_test, y_train, y_test = self.training_test_split(X, y)
@@ -78,20 +90,3 @@ class DataPreprocessing:
                 X_test,
                 y_train,
                 y_test,)
-
-    def get_ann_optimization_data(self):
-        X, y = self.data_splitter()
-        X_train, X_test, y_train, y_test = self.training_test_split(X, y)
-        X_train, X_val, y_train, y_val = self.training_test_split(X_train, y_train, test_size=0.2)
-        X_train, X_test, scaler = self.feature_scaling(X_train, X_test)
-        X_val = scaler.transform(X_val)
-        X_train, X_test, selector = self.feature_selection(X_train, X_test, y_train)
-        X_val = scaler.transform(X_val)
-        return (X_train,
-                X_test,
-                X_val,
-                y_train,
-                y_test,
-                y_val,
-                scaler,
-                selector)

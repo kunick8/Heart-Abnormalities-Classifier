@@ -10,7 +10,7 @@ models = ["LogisticRegression", "RandomForestClassifier", "NaiveBayes", "XGBClas
 
 
 Preprocessor = DataPreprocessing(dataset)
-preprocessed_data = Preprocessor.get_optimization_data()
+X_train, _, y_train, _ = Preprocessor.get_optimization_data()
 
 for model in models:
-    tune_model(model_name=model, X_train = preprocessed_data[0], y_train = preprocessed_data[2])
+    tune_model(model_name=model, X_train = X_train, y_train = y_train)

@@ -20,13 +20,13 @@ data extraction -> data cleaning -> train test split -> feature scaling -> featu
 I've decided to use 100 optuna trials per model to choose the best performing one, the goal was to maximize f1 score.
 I've used f1 score rather than accuracy because the classes are highly imbalanced, it ensures that the model won't try to classify every instance it's not entirely sure about as abnormal. 
 
-| Model                    | Best F1 score |
-|--------------------------|---------------|
-| Logistic regression      | 0.87          |
-| Random Forest Classifier | 0.9           | 
-| GaussianNB               | 0.84          |
-| XGB Classifier           | 0.88          |
-| SVC                      | 0.92          |
+| Model                    | Best F1 score | Standard Deviation |
+|--------------------------|---------------| -------------------|
+| Logistic regression      | 0.87          | 0.04 |
+| Random Forest Classifier | 0.88          | 0.05 |
+| GaussianNB               | 0.8           | 0.08 |
+| XGB Classifier           | 0.89          | 0.04 |
+| SVC                      | 0.89          | 0.02 |
 
 I've also created an ANN based on the Keras framework, i've used 100 trial optuna tuning
 to train 100-epoch models, the best accuracy I've achieved was 84%.

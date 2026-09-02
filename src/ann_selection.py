@@ -7,8 +7,8 @@ dataset1 = extract_data('../data/raw/SPECTF.test')
 dataset2 = extract_data('../data/raw/SPECTF.train')
 dataset = join_data(dataset1, dataset2)
 
-Preprocessor = DataPreprocessing(dataset)
-X_train, _, X_val, y_train, _, y_val, _, _ = Preprocessor.get_ann_optimization_data()
+preprocessor = DataPreprocessing(dataset)
+X_train, X_test, y_train, y_test, _, _ = preprocessor.get_preprocessed_data()
 
 
-tune_ann(X_train, X_val, y_train, y_val)
+tune_ann(X_train, y_train)
