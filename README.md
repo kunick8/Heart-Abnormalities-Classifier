@@ -19,19 +19,30 @@ data extraction -> data cleaning -> train test split -> feature scaling -> featu
 ## Model Selection
 I've decided to use 100 optuna trials per model to choose the best performing one, the goal was to maximize f1 score.
 I've used f1 score rather than accuracy because the classes are highly imbalanced, it ensures that the model won't try to classify every instance it's not entirely sure about as abnormal. 
+### Optuna Results
+
 
 | Model                    | Best F1 score | Standard Deviation |
-|--------------------------|---------------| -------------------|
-| Logistic regression      | 0.87          | 0.04 |
-| Random Forest Classifier | 0.88          | 0.05 |
-| GaussianNB               | 0.8           | 0.08 |
-| XGB Classifier           | 0.89          | 0.04 |
-| SVC                      | 0.89          | 0.02 |
+|--------------------------|---------------|--------------------|
+| Logistic regression      | 0.87          | 0.04               |
+| Random Forest Classifier | 0.88          | 0.05               |
+| GaussianNB               | 0.8           | 0.08               |
+| XGB Classifier           | 0.89          | 0.04               |
+| SVC                      | 0.89          | 0.02               |
 
-I've also created an ANN based on the Keras framework, i've used 100 trial optuna tuning
-to train 100-epoch models, the best accuracy I've achieved was 84%.
-Such accuracy in the most optimistic scenario would amount to an F1 score of 0.91.
-Thus I've decided to use SVC for the final model.
+### TestSet Results
+| Model                    | Best F1 score | Accuracy |
+|--------------------------|---------------|----------|
+| Logistic regression      | 0.82          | 0.74     |
+| Random Forest Classifier | 0.85          | 0.75     |
+| GaussianNB               | 0.8           | 0.74     |
+| XGB Classifier           | 0.84          | 0.75     |
+| SVC                      | 0.86          | 0.77     |
+| ANN                      | 0.85          | 0.75     |
+
+Based on these results i've decided to go with SVC for the final classifier
+
+
 
 ## File structure
 

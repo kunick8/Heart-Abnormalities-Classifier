@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 import streamlit as st
+import plotly.io as pio
 
 project_root = Path(__file__).parent.parent
 metrics_path = project_root / "artifacts" / "model" / "metrics.json"
@@ -36,10 +37,11 @@ col5.metric("Roc-auc", f"{metrics['roc_auc_score']:.3f}")
 
 st.divider()
 
-st.image(
-    str(charts_path / 'model_comparison.png'),
-    caption="Model Comparison"
-)
+try:
+    fig = pio.read_json(str(charts_path / 'model_comparison.json'))
+    st.plotly_chart(fig, use_container_width=True)
+except FileNotFoundError:
+    st.error("File not found")
 
 st.subheader('interpretation')
 
@@ -48,10 +50,11 @@ st.write()
 st.divider()
 
 
-st.image(
-    str(charts_path / 'confusion_matrix.png'),
-    caption="Confusion Matrix"
-)
+try:
+    fig_cm = pio.read_json(str(charts_path / 'confusion_matrix.json'))
+    st.plotly_chart(fig_cm, use_container_width=True)
+except FileNotFoundError:
+    st.error("File not found")
 
 st.subheader('interpretation')
 
@@ -59,10 +62,11 @@ st.write()
 
 st.divider()
 
-st.image(
-    str(charts_path / 'roc_curve.png'),
-    caption="ROC Curve"
-)
+try:
+    fig_roc = pio.read_json(str(charts_path / 'roc_curve.json'))
+    st.plotly_chart(fig_roc, use_container_width=True)
+except FileNotFoundError:
+    st.error("File not found")
 
 st.subheader('interpretation')
 
@@ -70,10 +74,11 @@ st.write()
 
 st.divider()
 
-st.image(
-    str(charts_path / 'precision_recall_curve.png'),
-    caption="Precision-Recall Curve"
-)
+try:
+    fig_pr = pio.read_json(str(charts_path / 'precision_recall_curve.json'))
+    st.plotly_chart(fig_pr, use_container_width=True)
+except FileNotFoundError:
+    st.error("File not found")
 
 st.subheader('interpretation')
 

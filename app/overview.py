@@ -1,4 +1,13 @@
 import streamlit as st
+import json
+import plotly.io as pio
+from pathlib import Path
+
+project_root = Path(__file__).parent.parent
+charts_dir = project_root / "artifacts" / "charts"
+charts_dir.mkdir(parents=True, exist_ok=True)
+path = charts_dir / "class_pie.json"
+
 
 st.set_page_config(
     page_title="Heart Abnormalities Classifier",
@@ -47,10 +56,11 @@ SVC
 )
 st.divider()
 
-st.image(
-    "artifacts/charts/class_pie.png",
-    caption="Class Pie"
-)
+try:
+    fig = pio.read_json(str(path))
+    st.plotly_chart(fig, use_container_width=True)
+except FileNotFoundError:
+    st.error("File not found")
 
 st.write(
     '''

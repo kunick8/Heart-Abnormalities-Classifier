@@ -88,13 +88,9 @@ def save_and_log_charts(X_test, y_test, y_pred, model):
     }
 
     for name, fig in charts.items():
-        path = charts_dir /f"{name}.png"
+        path = charts_dir /f"{name}.json"
 
-        fig.savefig(
-            path,
-            dpi=300,
-            bbox_inches="tight"
-        )
+        fig.write_json(str(path))
 
         mlflow.log_artifact(str(path), artifact_path="charts")
 
