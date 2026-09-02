@@ -37,11 +37,19 @@ def get_best_run(tracking_uri, experiment_name):
             f"Experiment '{experiment_name}' not found"
         )
 
-    runs = client.search_runs(
-        experiment_ids=[experiment.experiment_id],
-        order_by=["metrics.mean_cv_f1 DESC"],
-        max_results=1
-    )
+    if experiment_name == 'ANN_keras_optimization':
+        runs = client.search_runs(
+            experiment_ids=[experiment.experiment_id],
+            order_by=["metrics.best_accuracy DESC"],
+            max_results=1
+        )
+    else:
+        runs = client.search_runs(
+            experiment_ids=[experiment.experiment_id],
+            order_by=["metrics.mean_cv_f1 DESC"],
+            max_results=1
+        )
+
     if not runs:
         raise ValueError(f'Experiment "{experiment_name}" contains no runs')
 
@@ -68,30 +76,49 @@ def get_converted_params(tracking_uri, experiment_name):
     params = get_best_params(tracking_uri, experiment_name)
     params = params.copy()
 
-    if params['model'] == 'LogisticRegression':
+    if experiment_name == 'LogisticRegression_optimization':
         params['max_iter'] = int(params['max_iter'])
         params['C'] = float(params['C'])
         params['random_state'] = int(params['random_state'])
 
-    elif params['model'] == 'RandomForestClassifier':
+
+    elif experiment_name == 'RandomForestClassifier_optimization':
         params["n_estimators"] = int(params['n_estimators'])
         params['max_depth'] = int(params['max_depth'])
         params['min_samples_split'] = int(params['min_samples_split'])
+        params['random_state'] = int(params['random_state'])
 
-    elif params['model'] == 'NaiveBayes':
+    elif experiment_name == 'NaiveBayes_optimization':
         params['var_smoothing'] = float(params['var_smoothing'])
 
-    elif params['model'] == 'XGBClassifier':
+    elif experiment_name == 'XGBClassifier_optimization':
         params['n_estimators'] = int(params['n_estimators'])
         params['max_depth'] = int(params['max_depth'])
         params['min_child_weight'] = int(params['min_child_weight'])
         params['scale_pos_weight'] = float(params['scale_pos_weight'])
         params['learning_rate'] = float(params['learning_rate'])
+        params['random_state'] = int(params['random_state'])
 
-    elif params['model'] == 'SVC':
+    elif experiment_name == 'SVC_optimization':
         params['C'] = float(params['C'])
         params['gamma'] = float(params['gamma'])
         params['random_state'] = int(params['random_state'])
+
+    elif experiment_name == 'ANN_keras_optimization':
+        params['n_layers'] = int(params['n_layers'])
+        params['learning_rate'] = float(params['learning_rate'])
+        params['batch_size'] = int(params['batch_size'])
+        for i in range(params['n_layers']):
+            params[f'{i}_layer_neurons'] = int(params[f'{i}_layer_neurons'])
+
+    else:
+        raise ValueError(
+            f"Experiment '{experiment_name}' not found"
+        )
+
+
+
+
 
     params.pop('model', None)
     params.pop('trial_number', None)

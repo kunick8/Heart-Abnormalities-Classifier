@@ -1,5 +1,6 @@
 import pandas as pd
 import xgboost as xgb
+import numpy as np
 from sklearn.feature_selection import RFECV, SelectFromModel
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
@@ -11,13 +12,13 @@ class DataPreprocessing:
     def __init__(self, dataset:pd.DataFrame = None, X_train = None, y_train = None, X_test = None, y_test = None):
         if dataset is not None:
             self.dataset = dataset
-        if X_train:
+        if X_train is not None:
             self.X_train = X_train
-        if y_train:
+        if y_train is not None:
             self.y_train = y_train
-        if X_test:
+        if X_test is not None:
             self.X_test = X_test
-        if y_test:
+        if y_test is not None:
             self.y_test = y_test
 
 
@@ -56,12 +57,18 @@ class DataPreprocessing:
 
         return X_train, X_test, selector
 
-    def ann_feature_selection(self, X_train, X_test,  y_train):
+    def ann_feature_selection(self, X_train, X_test,  y_train, n_features = None):
 
         xgb_model = xgb.XGBClassifier(n_estimators=100, random_state=42)
         xgb_model.fit(X_train, y_train)
 
-        selector = SelectFromModel(xgb_model, prefit=True)
+        if n_features is None:
+            selector = SelectFromModel(xgb_model, prefit=True)
+        else:
+            selector = SelectFromModel(xgb_model, prefit=True,
+                                       threshold=-np.inf,
+                                       max_features=n_features
+                                       )
 
         X_train_selected = selector.transform(X_train)
         X_test_selected = selector.transform(X_test)
@@ -80,6 +87,20 @@ class DataPreprocessing:
             y_test,
             scaler,
             selector)
+
+    def get_preprocessed_data_non_linear (self, n_features:int = None):
+        X, y = self.data_splitter()
+        X_train, X_test, y_train, y_test = self.training_test_split(X, y)
+        X_train, X_test, scaler = self.feature_scaling(X_train, X_test)
+        X_train, X_test, selector = self.ann_feature_selection(X_train, X_test, y_train, n_features)
+        return (X_train,
+                X_test,
+                y_train,
+                y_test,
+                scaler,
+                selector)
+
+
 
     #data for ml models optuna optimizations, it's without feature selection or feature scaling
     #to prevent data leakage(optuna pipelines use k-fold for optimization)

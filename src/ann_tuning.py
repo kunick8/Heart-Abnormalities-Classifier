@@ -42,8 +42,8 @@ def objective(trial, X_train, y_train):
 
             preprocessor = DataPreprocessing(X_fold_train, y_fold_train, X_fold_val, y_fold_val)
 
-            X_fold_train, X_fold_val = preprocessor.feature_scaling(X_fold_train, X_fold_val)
-            X_fold_train, X_fold_val, _ = preprocessor.feature_selection(X_fold_train, X_fold_val, y_fold_val)
+            X_fold_train, X_fold_val, _ = preprocessor.feature_scaling(X_fold_train, X_fold_val)
+            X_fold_train, X_fold_val, _ = preprocessor.feature_selection(X_fold_train, X_fold_val, y_fold_train)
 
 
             network = NeuralNetwork(input_dim=X_fold_train.shape[1])
@@ -107,7 +107,7 @@ def tune_ann(
     y_train,
     n_trials=100
 ):
-    setup_mlflow(experiment_name="ANN_optimization")
+    setup_mlflow(experiment_name="ANN_keras_optimization")
     study = optuna.create_study(direction="maximize", study_name="ANN_optimization")
 
     study.optimize(lambda trial: objective(trial, X_train, y_train), n_trials=n_trials)
