@@ -21,7 +21,8 @@ st.write(
     This application uses a machine learning model
     to classify observations as normal or abnormal.
     
-    The model was trained using the SPECTF dataset.
+    The model was trained using the SPECTF dataset,
+    it contains precomputed SPECT heart images.
     """
 )
 
@@ -32,22 +33,22 @@ st.write(
 ## How does it work?
 
 Raw data
-   ↓
+   ->
 Data preprocessing
-   ↓
+   ->
 Feature scaling
-   ↓
+   ->
 Feature selection
-   ↓
+   ->
 SVC
-   ↓
+   ->
 Normal / Abnormal
 
 ---
 
 ## Final model
 
-SVC
+SVC - Support vector Machine
 
 ## Data Split
 
@@ -67,22 +68,23 @@ st.write(
 
 ## Model selection
 
-Several machine learning algorithms were evaluated
-using cross-validation and hyperparameter optimization
-with Optuna.
+5 different Machine Learning models and an Artificial Neural Network were trained, optimized and tested to find the best performing one.
 
-The final model was selected based on mean CV F1 score.
+The final model was selected based on F1 score and accuracy metrics.
 
 ---
 
 ## Technologies
 
-Python
-Scikit-learn
-Optuna
-MLflow
-TensorFlow
-Streamlit
+Python,
+Scikit-learn,
+Optuna,
+MLflow,
+TensorFlow,
+Streamlit,
+Plotly,
+Seaborn,
+XGBoost
     
     '''
 )

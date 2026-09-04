@@ -1,12 +1,20 @@
 import numpy as np
 import streamlit as st
 import sys
+import os
 from pathlib import Path
 
-from src.predict import predict
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+
+folder_b_path = os.path.join(parent_dir, 'src')
+sys.path.append('src')
 
 project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root))
+
+from src.predict import predict
 
 st.set_page_config(
     page_title="Heart Abnormalities Classifier",
@@ -25,14 +33,13 @@ st.write(
 st.header('Make a prediction')
 st.write(
     """
-    Enter the patient's feature values below.
+    Enter the feature values below.
     """
 )
-
+X = None
 FEATURE_NAMES = []
 for i in range(1,45):
     FEATURE_NAMES.append(f'feature_{i}')
-
 with st.form("prediction_form"):
 
     st.write("Enter feature values")
@@ -45,8 +52,10 @@ with st.form("prediction_form"):
         with columns[i % 4]:
             value = st.number_input(
                 feature,
-                value=0.0,
-                format="%.4f",
+                min_value=0,
+                max_value=100,
+                value=0,
+                step=1,
                 key=feature
             )
             values.append(value)
@@ -58,19 +67,21 @@ with st.form("prediction_form"):
 
     if submitted:
         X = np.array(values).reshape(1, -1)
-
+        prediction = predict(X)
 st.divider()
 
-prediction = predict(X)
+if X is not None:
+    st.write(
+        '''
+    ### Result
 
-st.write(
-    '''
-### Result
+    The model classified this observation as:
+        '''
+    )
+    st.write(f'##### {prediction}')
+else:
+    st.write('You must first submit data to make a prediction')
 
-The model classified this observation as:
-    '''
-)
-st.write(f'Prediction: {prediction}')
 st.write(
     '''
 This is a machine-learning classification result and

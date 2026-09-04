@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.feature_selection import RFECV
 
 from src.data.data_cleaning import join_data
-from src.data.data_preprocessing import DataPreprocessing
+from src.data.data_preprocessing import *
 
 
 def test_data_splitter():
@@ -13,8 +13,7 @@ def test_data_splitter():
         "feature_2": [1, 2, 3, 4]
     })
 
-    preprocessor = DataPreprocessing(data)
-    X, y = preprocessor.data_splitter()
+    X, y = data_splitter(data)
     assert X.shape == (4, 2)
     assert y.shape == (4,)
 
@@ -30,10 +29,10 @@ def test_train_test_split():
         'feature_2': range(10,20)
     })
 
-    preprocessor = DataPreprocessing(data)
-    X, y = preprocessor.data_splitter()
 
-    X_train, X_test, y_train, y_test = preprocessor.training_test_split(X,y, test_size=0.3)
+    X, y = data_splitter(data)
+
+    X_train, X_test, y_train, y_test = training_test_split(X,y, test_size=0.3)
 
     assert len(X_train) == 7
     assert len(X_test) == 3
@@ -48,12 +47,12 @@ def test_feature_scaling():
         'feature_2': range(10, 20)
     })
 
-    preprocessor = DataPreprocessing(data)
-    X, y = preprocessor.data_splitter()
 
-    X_train, X_test, _, _ = preprocessor.training_test_split(X, y)
+    X, y = data_splitter(data)
 
-    X_train, X_test, _ = preprocessor.feature_scaling(X_train, X_test)
+    X_train, X_test, _, _ = training_test_split(X, y)
+
+    X_train, X_test, _ = feature_scaling(X_train, X_test)
 
     assert np.allclose(
         X_train.mean(axis=0),
@@ -74,14 +73,14 @@ def test_feature_selection():
         'feature_2': range(40, 80)
     })
 
-    preprocessor = DataPreprocessing(data)
-    X, y = preprocessor.data_splitter()
 
-    X_train, X_test, y_train, _ = preprocessor.training_test_split(X, y)
+    X, y = data_splitter(data)
 
-    X_train, X_test, _ = preprocessor.feature_scaling(X_train, X_test)
+    X_train, X_test, y_train, _ = training_test_split(X, y)
 
-    X_train_sel, X_test_sel, selector = preprocessor.feature_selection(X_train, X_test, y_train)
+    X_train, X_test, _ = feature_scaling(X_train, X_test)
+
+    X_train_sel, X_test_sel, selector = feature_selection(X_train, X_test, y_train)
 
     assert X_train_sel.shape[0] == X_train.shape[0]
     assert X_test_sel.shape[0] == X_test.shape[0]

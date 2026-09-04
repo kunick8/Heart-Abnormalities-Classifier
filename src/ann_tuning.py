@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 
 from src.mlflow_config import log_ann_trial, setup_mlflow
 from src.model import NeuralNetwork
-from src.data.data_preprocessing import DataPreprocessing
+from src.data.data_preprocessing import get_preprocessed_data_non_linear, feature_scaling, ann_feature_selection
 
 def objective(trial, X_train, y_train):
 
@@ -40,10 +40,9 @@ def objective(trial, X_train, y_train):
             X_fold_train, y_fold_train = X_train[train_idx], y_train[train_idx]
             X_fold_val, y_fold_val = X_train[val_idx], y_train[val_idx]
 
-            preprocessor = DataPreprocessing(X_fold_train, y_fold_train, X_fold_val, y_fold_val)
 
-            X_fold_train, X_fold_val, _ = preprocessor.feature_scaling(X_fold_train, X_fold_val)
-            X_fold_train, X_fold_val, _ = preprocessor.feature_selection(X_fold_train, X_fold_val, y_fold_train)
+            X_fold_train, X_fold_val, _ = feature_scaling(X_fold_train, X_fold_val)
+            X_fold_train, X_fold_val, _ = ann_feature_selection(X_fold_train, X_fold_val, y_fold_train)
 
 
             network = NeuralNetwork(input_dim=X_fold_train.shape[1])

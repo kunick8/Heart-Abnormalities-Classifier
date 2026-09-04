@@ -7,107 +7,95 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 
-class DataPreprocessing:
-
-    def __init__(self, dataset:pd.DataFrame = None, X_train = None, y_train = None, X_test = None, y_test = None):
-        if dataset is not None:
-            self.dataset = dataset
-        if X_train is not None:
-            self.X_train = X_train
-        if y_train is not None:
-            self.y_train = y_train
-        if X_test is not None:
-            self.X_test = X_test
-        if y_test is not None:
-            self.y_test = y_test
 
 
-    def data_splitter(self):
-        X = self.dataset.iloc[:, 1:].values
-        y = self.dataset.iloc[:, 0].values
-        return X, y
 
-    def training_test_split(self, X, y, test_size=0.3):
-        return train_test_split(
-            X,
-            y,
-            test_size=test_size,
-            random_state=42
-        )
+def data_splitter(dataset):
+    X = dataset.iloc[:, 1:].values
+    y = dataset.iloc[:, 0].values
+    return X, y
 
-    def feature_scaling(self, X_train, X_test):
-        scaler = StandardScaler()
+def training_test_split(X, y, test_size=0.3):
+    return train_test_split(
+        X,
+        y,
+        test_size=test_size,
+        random_state=42
+    )
 
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.transform(X_test)
+def feature_scaling(X_train, X_test):
+    scaler = StandardScaler()
 
-        return X_train, X_test, scaler
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
 
-    def feature_selection(self, X_train, X_test, y_train):
-        selector = RFECV(
-            estimator=LogisticRegression(
-                random_state=42,
-                max_iter=1000
-            ),
-            n_jobs=-1
-        )
+    return X_train, X_test, scaler
 
-        X_train = selector.fit_transform(X_train, y_train)
-        X_test = selector.transform(X_test)
+def feature_selection(X_train, X_test, y_train):
+    selector = RFECV(
+        estimator=LogisticRegression(
+            random_state=42,
+            max_iter=1000
+        ),
+        n_jobs=-1
+    )
 
-        return X_train, X_test, selector
+    X_train = selector.fit_transform(X_train, y_train)
+    X_test = selector.transform(X_test)
 
-    def ann_feature_selection(self, X_train, X_test,  y_train, n_features = None):
+    return X_train, X_test, selector
 
-        xgb_model = xgb.XGBClassifier(n_estimators=100, random_state=42)
-        xgb_model.fit(X_train, y_train)
+def ann_feature_selection(X_train, X_test,  y_train, n_features = None):
 
-        if n_features is None:
-            selector = SelectFromModel(xgb_model, prefit=True)
-        else:
-            selector = SelectFromModel(xgb_model, prefit=True,
-                                       threshold=-np.inf,
-                                       max_features=n_features
-                                       )
+    xgb_model = xgb.XGBClassifier(n_estimators=100, random_state=42)
+    xgb_model.fit(X_train, y_train)
 
-        X_train_selected = selector.transform(X_train)
-        X_test_selected = selector.transform(X_test)
+    if n_features is None:
+        selector = SelectFromModel(xgb_model, prefit=True)
+    else:
+        selector = SelectFromModel(xgb_model, prefit=True,
+                                    threshold=-np.inf,
+                                    max_features=n_features
+                                    )
 
-        return X_train_selected, X_test_selected, selector
+    X_train_selected = selector.transform(X_train)
+    X_test_selected = selector.transform(X_test)
+
+    return X_train_selected, X_test_selected, selector
 
 
-    def get_preprocessed_data(self):
-        X, y = self.data_splitter()
-        X_train, X_test, y_train, y_test = self.training_test_split(X, y)
-        X_train, X_test, scaler = self.feature_scaling(X_train, X_test)
-        X_train, X_test, selector = self.feature_selection(X_train, X_test, y_train)
-        return (X_train,
+def get_preprocessed_data(dataset):
+    X, y = data_splitter(dataset)
+    X_train, X_test, y_train, y_test = training_test_split(X, y)
+    X_train, X_test, scaler = feature_scaling(X_train, X_test)
+    X_train, X_test, selector = feature_selection(X_train, X_test, y_train)
+    return (X_train,
             X_test,
             y_train,
             y_test,
             scaler,
             selector)
 
-    def get_preprocessed_data_non_linear (self, n_features:int = None):
-        X, y = self.data_splitter()
-        X_train, X_test, y_train, y_test = self.training_test_split(X, y)
-        X_train, X_test, scaler = self.feature_scaling(X_train, X_test)
-        X_train, X_test, selector = self.ann_feature_selection(X_train, X_test, y_train, n_features)
-        return (X_train,
-                X_test,
-                y_train,
-                y_test,
-                scaler,
-                selector)
+def get_preprocessed_data_non_linear (dataset, n_features:int = None):
+    X, y = data_splitter(dataset)
+    X_train, X_test, y_train, y_test = training_test_split(X, y)
+    X_train, X_test, scaler = feature_scaling(X_train, X_test)
+    X_train, X_test, selector = ann_feature_selection(X_train, X_test, y_train, n_features)
+    return (X_train,
+            X_test,
+            y_train,
+            y_test,
+            scaler,
+            selector)
 
 
 
     #data for ml models optuna optimizations, it's without feature selection or feature scaling
     #to prevent data leakage(optuna pipelines use k-fold for optimization)
-    def get_optimization_data(self):
-        X, y = self.data_splitter()
-        X_train, X_test, y_train, y_test = self.training_test_split(X, y)
-        return (X_train,
-                X_test,
-                y_train,
-                y_test,)
+def get_optimization_data(dataset):
+    X, y = data_splitter(dataset)
+    X_train, X_test, y_train, y_test = training_test_split(X, y)
+    return (X_train,
+            X_test,
+            y_train,
+            y_test,)

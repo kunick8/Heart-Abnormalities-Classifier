@@ -11,7 +11,6 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 
-from src.mlflow_config import get_best_score_per_model
 from src.visualization.charts import (
     plot_class_pie,
     plot_model_comparison,
@@ -51,14 +50,13 @@ def plot_charts(X_test, y_test, y_pred, model):
     roc_fig = plot_roc_curve(y_test, scores)
     pr_fig = plot_pr_curve(y_test, scores)
     class_pie_fig = plot_class_pie(y_test, y_pred)
-    score_per_model = get_best_score_per_model("http://localhost:5000",{
-        'LogisticRegression_optimization',
-        'RandomForestClassifier_optimization',
-        'NaiveBayes_optimization',
-        'XGBClassifier_optimization',
-        'SVC_optimization'
-        })
-    model_comparison_fig = plot_model_comparison(score_per_model)
+
+    project_root = Path(__file__).parent.parent
+    metrics_path = project_root / "artifacts" / "scores" / "f1_scores.json"
+    metrics_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(metrics_path, "r") as f:
+        scores_per_model = json.load(f)
+    model_comparison_fig = plot_model_comparison(scores_per_model)
 
 
     return {
