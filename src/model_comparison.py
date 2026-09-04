@@ -1,6 +1,4 @@
 import tensorflow as tf
-import json
-from pathlib import Path
 
 from src.data.data_cleaning import join_data
 from src.data.data_extractor import extract_data
@@ -15,12 +13,13 @@ dataset = join_data(dataset1, dataset2)
 
 
 
-def compare_trained_models(dataset):
-    models = ["LogisticRegression", "RandomForestClassifier", "NaiveBayes", "XGBClassifier", "SVC"]
+def compare_trained_models(dataset, models:list):
 
 
     f1_scores = {}
     accuracy_scores ={}
+    best_model = None
+    best_f1_score = 0
     for model in models:
         params = get_converted_params("http://localhost:5000", f'{model}_optimization', )
         classifier = Classifier(model)
@@ -34,14 +33,20 @@ def compare_trained_models(dataset):
         predictor = classifier.create_model(params)
         predictor.fit(X_train, y_train)
         y_pred = predictor.predict(X_test)
-        f1_scores[model] = f1_score(y_test, y_pred)
+
+        model_f1_score = f1_score(y_test, y_pred)
+        f1_scores[model] = model_f1_score
         accuracy_scores[model] = accuracy_score(y_test, y_pred)
 
+        if model_f1_score > best_f1_score:
+            best_f1_score = model_f1_score
+            best_model = predictor
 
 
     params = get_converted_params("http://localhost:5000",'ANN_keras_optimization')
     X_train, X_test, y_train, y_test, _, _ = get_preprocessed_data_non_linear(dataset, params['0_layer_neurons'])
     network = NeuralNetwork(X_train.shape[1])
+
     for i in range(params['n_layers']):
         if i > 0:
             network.add_dense_layer(units=params[f'{i}_layer_neurons'], activation=params[f'{i}_layer_activation'])
@@ -61,19 +66,17 @@ def compare_trained_models(dataset):
     network.compile(compile_params)
     network.fit(X_train, y_train, epochs=50, batch_size=params['batch_size'])
     y_pred = network.predict(X_test)
-    for pred in y_pred:
-        if pred >= 0.5:
-            pred = 1
-        else:
-            pred = 0
+
     y_pred = (y_pred >= 0.5).astype(int).ravel()
 
-    f1_scores["ANN"] = f1_score(y_test, y_pred)
+    ann_f1_score = f1_score(y_test, y_pred)
+    f1_scores["ANN"] = ann_f1_score
     accuracy_scores["ANN"] = accuracy_score(y_test, y_pred)
 
+    if ann_f1_score > best_f1_score:
+        best_model = network
 
-    return f1_scores, accuracy_scores
-
+    return f1_scores, accuracy_scores, best_model
 
 
 

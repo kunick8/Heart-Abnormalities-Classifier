@@ -3,11 +3,10 @@ import optuna
 import tensorflow as tf
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
-from sklearn.preprocessing import StandardScaler
 
 from src.mlflow_config import log_ann_trial, setup_mlflow
 from src.model import NeuralNetwork
-from src.data.data_preprocessing import get_preprocessed_data_non_linear, feature_scaling, ann_feature_selection
+from src.data.data_preprocessing import feature_scaling, ann_feature_selection
 
 def objective(trial, X_train, y_train):
 

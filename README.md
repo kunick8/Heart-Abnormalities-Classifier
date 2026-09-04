@@ -30,7 +30,7 @@ I've used f1 score rather than accuracy because the classes are highly imbalance
 | XGB Classifier           | 0.89          | 0.04               |
 | SVC                      | 0.89          | 0.02               |
 
-### TestSet Results
+### Test Set Results
 | Model                    | Best F1 score | Accuracy |
 |--------------------------|---------------|----------|
 | Logistic regression      | 0.82          | 0.74     |
@@ -40,12 +40,92 @@ I've used f1 score rather than accuracy because the classes are highly imbalance
 | SVC                      | 0.86          | 0.77     |
 | ANN                      | 0.85          | 0.75     |
 
-Based on these results i've decided to go with SVC for the final classifier
+Based on these results I've decided to go with SVC for the final classifier
 
 
 
 ## File structure
 
 ## How to run the project
+
+### Option 1 - run the local hosted site with charts, interpretations and predictions
+
+#### Step 1 - install poetry and dependencies through the terminal
+```
+pip install poetry
+
+```
+
+#### Step 2 - launch the streamlit local host
+```
+streamlit run app/streamlit_app.py
+
+```
+
+All set, your browser should automatically open the local hosted site, if not then copy the url from the terminal
+
+### Option 2 - train the final model and then run the local hosted site
+
+#### Step 1 - install poetry and dependencies through the terminal
+```
+pip install poetry
+
+```
+
+#### Step 2 - setup mlflow server
+```
+mlflow server --host 127.0.0.1 --port 5000 
+ 
+```
+
+#### Step 3 - run main.py to train the model
+```
+python3 src.main.py                                                                             
+```
+
+#### Step 4 - launch the streamlit local host
+```
+streamlit run app/streamlit_app.py
+
+```
+
+All set, your browser should automatically open the local hosted site, if not then copy the url from the terminal
+
+### Option 3 - run the whole evaluation and training pipeline
+
+#### Step 1 - install poetry and dependencies through the terminal
+```
+pip install poetry
+
+```
+
+#### Step 2 - setup mlflow server
+```
+mlflow server --host 127.0.0.1 --port 5000 
+ 
+```
+
+#### step 3 run evaluation_pipeline.py
+```
+python3 src.evaluation_pipeline.py
+```
+
+#### step 4 check out the results on the mlflow site
+
+open http:localhost:5000 in your browser
+
+#### Step 5 - run main.py to train the model
+```
+python3 src.main.py                                                                             
+```
+
+#### Step 6 - launch the streamlit local host
+```
+streamlit run app/streamlit_app.py
+
+```
+
+All set, your browser should automatically open the local hosted site, if not then copy the url from the terminal
+
 
 ## wnioski i interpretacja po ang xd

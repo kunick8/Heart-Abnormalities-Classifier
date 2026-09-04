@@ -12,7 +12,6 @@ from src.model import Classifier
 current_dir = Path(__file__).parent
 model_dir = current_dir.parent / "artifacts" / "model"
 model_dir.mkdir(parents=True, exist_ok=True)
-model_path = model_dir / "svc.joblib"
 
 dataset1 = extract_data('../data/raw/SPECTF.test')
 dataset2 = extract_data('../data/raw/SPECTF.train')

@@ -8,8 +8,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectFromModel
 
-from mlflow_config import log_trial, setup_mlflow
-from model import Classifier
+from src.mlflow_config import log_trial, setup_mlflow
+from src.model import Classifier
 
 
 def objective(trial, X_train, y_train, model_name):
@@ -44,7 +44,7 @@ def objective(trial, X_train, y_train, model_name):
                   'n_estimators': trial.suggest_int("n_estimators", 100, 200),
                   'max_depth': trial.suggest_int("max_depth", 3, 7),
                   'min_child_weight': trial.suggest_int("min_child_weight", 1, 5),
-                  'scale_pos_weight': (np.count_nonzero(y_train == 0))/(np.count_nonzero(y_train == 1)),
+                  'scale_pos_weight': (np.count_nonzero(y_train == 1))/(np.count_nonzero(y_train == 0)),
                   'random_state': 42,
                   }
     elif model_name == 'SVC':
@@ -90,7 +90,7 @@ def objective(trial, X_train, y_train, model_name):
         X_train,
         y_train,
         cv=cv,
-        scoring="f1",
+        scoring="f1_macro",
         n_jobs=-1
     )
 

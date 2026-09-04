@@ -1,27 +1,36 @@
-import tensorflow as tf
 import json
 from pathlib import Path
 
-from src.data import data_cleaning
 from src.data.data_cleaning import join_data
 from src.data.data_extractor import extract_data
 from src.model_comparison import compare_trained_models
-from src.tune import tune_model
-from src.ann_tuning import tune_ann
-from src.data.data_preprocessing import DataPreprocessing
+from src.tuning.model_evaluation import evaluate_models
+from src.tuning.ann_evaluation import evaluate_ann
+from src.data.data_preprocessing import get_preprocessed_data_non_linear
+
 
 project_root = Path(__file__).parent.parent
 scores_dir = project_root / "artifacts" / "scores"
 scores_dir.mkdir(parents=True, exist_ok=True)
 
+
+
 dataset1 = extract_data('../data/raw/SPECTF.test')
 dataset2 = extract_data('../data/raw/SPECTF.train')
 dataset = join_data(dataset1, dataset2)
 
-preprocessor = DataPreprocessing()
-X_train, X_test, y_train, y_test, _, _ = preprocessor.get_preprocessed_data_non_linear()
+models =["LogisticRegression", "RandomForestClassifier", "NaiveBayes", "XGBClassifier", "SVC"]
 
-f1_scores, accuracy_scores = compare_trained_models(dataset)
+evaluate_models(models=models, dataset=dataset)
+evaluate_ann(dataset)
+
+
+
+X_train, X_test, y_train, y_test, _, _ = get_preprocessed_data_non_linear(dataset)
+
+
+
+f1_scores, accuracy_scores, model = compare_trained_models(dataset,models =models)
 
 
 
