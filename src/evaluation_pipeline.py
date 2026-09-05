@@ -6,7 +6,6 @@ from src.data.data_extractor import extract_data
 from src.model_comparison import compare_trained_models
 from src.tuning.model_evaluation import evaluate_models
 from src.tuning.ann_evaluation import evaluate_ann
-from src.data.data_preprocessing import get_preprocessed_data_non_linear
 
 
 project_root = Path(__file__).parent.parent
@@ -26,7 +25,6 @@ evaluate_ann(dataset)
 
 
 
-X_train, X_test, y_train, y_test, _, _ = get_preprocessed_data_non_linear(dataset)
 
 
 

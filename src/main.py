@@ -5,7 +5,7 @@ from src.data.data_cleaning import join_data
 from src.data.data_extractor import extract_data
 from src.data.data_preprocessing import get_preprocessed_data
 from src.evaluation_metrics import evaluate_model, save_and_log_charts
-from src.mlflow_config import get_converted_params
+from src.mlflow_functions import get_converted_params
 from src.model import Classifier
 
 
@@ -19,12 +19,12 @@ dataset2 = extract_data('../data/raw/SPECTF.train')
 dataset = join_data(dataset1, dataset2)
 
 
-
-
-X_train, X_test, y_train, y_test, scaler, selector = get_preprocessed_data(dataset)
-
-params = get_converted_params(tracking_uri="http://localhost:5000", experiment_name='SVC_optimization')
+params, smote_ratio = get_converted_params(tracking_uri="http://localhost:5000", experiment_name='SVC_optimization')
 classifier = Classifier('SVC')
+
+X_train, X_test, y_train, y_test, scaler, selector, _ = get_preprocessed_data(dataset, smote_ratio=smote_ratio)
+
+
 
 model = classifier.create_model(params)
 

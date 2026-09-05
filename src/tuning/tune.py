@@ -2,24 +2,27 @@ import mlflow
 import numpy as np
 import optuna
 from sklearn.model_selection import StratifiedKFold, cross_val_score
-from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectFromModel
+from imblearn.pipeline import Pipeline
+from imblearn.over_sampling import SMOTE
 
-from src.mlflow_config import log_trial, setup_mlflow
+from src.mlflow_functions import log_trial, setup_mlflow
 from src.model import Classifier
 
-
 def objective(trial, X_train, y_train, model_name):
+
+    use_class_weights = trial.suggest_categorical("use_class_weights", [True, False])
+
     if model_name == "LogisticRegression":
         params = {}
         solver = trial.suggest_categorical("solver", [ "lbfgs", "liblinear"])
         params['C'] = trial.suggest_float("C", 1e-3, 100, log=True)
         params['max_iter'] = 2000
         params['random_state'] = 42
-        params['class_weight'] = 'balanced'
+        params['class_weight'] = 'balanced' if use_class_weights else None
         params["solver"] = solver
         if solver == "liblinear":
             params['penalty'] = trial.suggest_categorical("penalty_liblinear", [ "l1", "l2"])
@@ -31,7 +34,7 @@ def objective(trial, X_train, y_train, model_name):
                   'max_depth': trial.suggest_int("max_depth", 10, 100),
                   'min_samples_split': trial.suggest_int("min_samples_split", 2, 5),
                   'criterion': trial.suggest_categorical("criterion",['gini','entropy']),
-                  'class_weight': 'balanced',
+                  'class_weight': 'balanced' if use_class_weights else None,
                   'random_state': 42,
                   }
 
@@ -51,11 +54,12 @@ def objective(trial, X_train, y_train, model_name):
         params = {'C': trial.suggest_float("C", 1e-3, 50, log=True),
                   'kernel': trial.suggest_categorical("kernel",['linear','rbf']),
                   'gamma': trial.suggest_float("gamma", 1e-3, 5, log=True),
-                  'class_weight': 'balanced',
+                  'class_weight': 'balanced' if use_class_weights else None,
                   'random_state': 42,
                   }
     else:
         raise ValueError("Invalid model name")
+
 
     classifier = Classifier(model_name)
     model = classifier.create_model(params)
@@ -71,10 +75,14 @@ def objective(trial, X_train, y_train, model_name):
     threshold = trial.suggest_categorical("feature_selection_threshold", ["mean", "median", "1.25*mean"])
     selector = SelectFromModel(estimator=selector_estimator, threshold=threshold)
 
+    sampling_strategy = trial.suggest_float("sampling_strategy", 0.3, 1)
+    smote = SMOTE(random_state=42, sampling_strategy=sampling_strategy)
+
     steps = []
     if needs_scaling:
         steps.append(("scaler", StandardScaler()))
 
+    steps.append(("smote", smote))
     steps.append(("selector", selector))
     steps.append(("classifier", model))
 
@@ -93,6 +101,7 @@ def objective(trial, X_train, y_train, model_name):
         scoring="f1_macro",
         n_jobs=-1
     )
+    params['smote_ratio'] = sampling_strategy
 
     f1_mean = scores.mean()
     metrics = {'mean_cv_f1': f1_mean, 'mean_std_f1': scores.std()}

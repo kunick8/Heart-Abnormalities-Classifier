@@ -116,15 +116,18 @@ def get_converted_params(tracking_uri, experiment_name):
             f"Experiment '{experiment_name}' not found"
         )
 
+    params['smote_ratio'] = float(params['smote_ratio'])
+
 
 
 
 
     params.pop('model', None)
     params.pop('trial_number', None)
+    smote_ratio = params.pop('smote_ratio', None)
 
 
-    return params
+    return params, smote_ratio
 
 def get_best_metrics(
     tracking_uri, experiment_name):
@@ -138,11 +141,3 @@ def get_best_metrics(
 
     return metrics
 
-
-def get_best_score_per_model(tracking_uri, experiment_names:set):
-    score_per_model = {}
-    for experiment in experiment_names:
-        metrics = get_best_metrics(tracking_uri, experiment)
-        model= experiment[:-13]
-        score_per_model[model] = float(metrics['mean_cv_f1'])
-    return score_per_model

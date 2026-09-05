@@ -3,8 +3,11 @@ import optuna
 import tensorflow as tf
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import f1_score
+from sklearn.utils.class_weight import compute_class_weight
+from imblearn.over_sampling import SMOTE
 
-from src.mlflow_config import log_ann_trial, setup_mlflow
+from src.mlflow_functions import log_ann_trial, setup_mlflow
 from src.model import NeuralNetwork
 from src.data.data_preprocessing import feature_scaling, ann_feature_selection
 
@@ -15,19 +18,19 @@ def objective(trial, X_train, y_train):
     optimizer_name = trial.suggest_categorical("optimizer", ["sgd", "adam"])
     batch_size = trial.suggest_categorical("batch_size", [16, 32, 64, 128])
 
+    smote_ratio = trial.suggest_float("smote_ratio", 0.3, 1.0)
+    use_class_weight = trial.suggest_categorical("use_class_weight", [True, False])
+
     layer_params = {}
     for i in range(n_layers):
-        if i == 0:
-            num_hidden = X_train.shape[1]
-        else:
-            num_hidden = trial.suggest_int(f"{i}_layer_neurons", 6, 128)
 
+        num_hidden = trial.suggest_int(f"{i}_layer_neurons", 6, 128)
         activation = trial.suggest_categorical(f"{i}_layer_activation", ["relu", "tanh"])
         layer_params[f"{i}_layer_activation"] = activation
         layer_params[f"{i}_layer_neurons"] = num_hidden
 
     kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
-    fold_accuracies = []
+    fold_f1scores = []
     fold_losses = []
 
     with mlflow.start_run(run_name=f"ANN_trial_{trial.number}"):
@@ -41,8 +44,19 @@ def objective(trial, X_train, y_train):
 
 
             X_fold_train, X_fold_val, _ = feature_scaling(X_fold_train, X_fold_val)
+
+            smote = SMOTE(random_state=42, sampling_strategy=smote_ratio)
+            X_fold_train, y_fold_train = smote.fit_resample(X_fold_train, y_fold_train)
+
             X_fold_train, X_fold_val, _ = ann_feature_selection(X_fold_train, X_fold_val, y_fold_train)
 
+
+            if use_class_weight:
+                classes = np.unique(y_fold_train)
+                weights = compute_class_weight(class_weight='balanced' ,classes = classes, y = y_fold_train)
+                class_weight_dict = dict(zip(classes, weights))
+            else:
+                class_weight_dict = None
 
             network = NeuralNetwork(input_dim=X_fold_train.shape[1])
 
@@ -69,36 +83,44 @@ def objective(trial, X_train, y_train):
                 )
             ]
 
+
             history = network.fit(
                 X_fold_train,
                 y_fold_train,
                 validation_data=(X_fold_val, y_fold_val),
                 batch_size=batch_size,
                 callbacks=callbacks,
-                epochs=100
+                epochs=100,
+                class_weight=class_weight_dict
             )
 
-            best_val_accuracy = max(history.history['val_accuracy'])
-            best_val_loss = min(history.history['val_loss'])
 
-            fold_accuracies.append(best_val_accuracy)
-            fold_losses.append(best_val_loss)
 
-        avg_accuracy = np.mean(fold_accuracies)
-        avg_loss = np.mean(fold_losses)
+
+            val_probs = network.predict(X_fold_val).ravel()
+            val_preds = (val_probs >= 0.5).astype(int)
+            fold_f1 = f1_score(y_fold_val, val_preds, average='macro')
+            fold_f1scores.append(fold_f1)
+            fold_losses.append(min(history.history['val_loss']))
+
+        mean_f1_score = np.mean(fold_f1scores)
+        mean_loss =np.mean(fold_losses)
 
         params = {
             'n_layers': n_layers,
             'learning_rate': learning_rate,
             'batch_size': batch_size,
-            'optimizer': optimizer_name
+            'optimizer': optimizer_name,
+            'smote_ratio': smote_ratio,
+            'use_class_weight': use_class_weight,
+
         }
         params.update(layer_params)
-        metrics = {'best_accuracy': avg_accuracy, 'best_loss': avg_loss}
+        metrics = {'mean_f1_score': mean_f1_score, 'mean_loss': mean_loss}
 
         log_ann_trial(params=params, metrics=metrics, trial_number=trial.number)
 
-    return avg_accuracy
+    return mean_f1_score
 
 def tune_ann(
     X_train,

@@ -1,9 +1,11 @@
 import tensorflow as tf
+import numpy as np
+from sklearn.utils.class_weight import compute_class_weight
 
 from src.data.data_cleaning import join_data
 from src.data.data_extractor import extract_data
 from src.data.data_preprocessing import get_preprocessed_data_non_linear, get_preprocessed_data
-from src.mlflow_config import  get_converted_params
+from src.mlflow_functions import  get_converted_params
 from src.model import Classifier, NeuralNetwork
 from sklearn.metrics import accuracy_score, f1_score
 
@@ -21,13 +23,13 @@ def compare_trained_models(dataset, models:list):
     best_model = None
     best_f1_score = 0
     for model in models:
-        params = get_converted_params("http://localhost:5000", f'{model}_optimization', )
+        params, smote_ratio = get_converted_params("http://localhost:5000", f'{model}_optimization', )
         classifier = Classifier(model)
 
         if model in ["RandomForestClassifier", "XGBClassifier"]:
-            X_train, X_test, y_train, y_test, _, _ = get_preprocessed_data_non_linear(dataset)
+            X_train, X_test, y_train, y_test, _, _ = get_preprocessed_data_non_linear(dataset, smote_ratio = smote_ratio)
         else:
-            X_train, X_test, y_train, y_test, _, _ = get_preprocessed_data(dataset)
+            X_train, X_test, y_train, y_test, _, _ = get_preprocessed_data(dataset, smote_ratio = smote_ratio)
 
 
         predictor = classifier.create_model(params)
@@ -43,15 +45,21 @@ def compare_trained_models(dataset, models:list):
             best_model = predictor
 
 
-    params = get_converted_params("http://localhost:5000",'ANN_keras_optimization')
-    X_train, X_test, y_train, y_test, _, _ = get_preprocessed_data_non_linear(dataset, params['0_layer_neurons'])
+    params, smote_ratio = get_converted_params("http://localhost:5000",'ANN_keras_optimization')
+    X_train, X_test, y_train, y_test, _, _, _ = get_preprocessed_data_non_linear(dataset, params['0_layer_neurons'], smote_ratio = smote_ratio)
+    if params['use_class_weight']:
+        classes = np.unique(y_train)
+        weights = compute_class_weight(class_weight='balanced', classes=classes, y=y_train)
+        class_weight_dict = dict(zip(classes, weights))
+    else:
+        class_weight_dict = None
+
+
     network = NeuralNetwork(X_train.shape[1])
 
     for i in range(params['n_layers']):
-        if i > 0:
-            network.add_dense_layer(units=params[f'{i}_layer_neurons'], activation=params[f'{i}_layer_activation'])
-        else:
-            network.add_dense_layer(units=X_train.shape[1], activation=params[f'{i}_layer_activation'])
+        network.add_dense_layer(units=params[f'{i}_layer_neurons'], activation=params[f'{i}_layer_activation'])
+
 
     network.add_dense_layer(units = 1, activation= 'sigmoid')
 
@@ -64,7 +72,9 @@ def compare_trained_models(dataset, models:list):
 
     compile_params = {'optimizer': optimizer}
     network.compile(compile_params)
-    network.fit(X_train, y_train, epochs=50, batch_size=params['batch_size'])
+
+
+    network.fit(X_train, y_train, epochs=50, batch_size=params['batch_size'], class_weight=class_weight_dict)
     y_pred = network.predict(X_test)
 
     y_pred = (y_pred >= 0.5).astype(int).ravel()

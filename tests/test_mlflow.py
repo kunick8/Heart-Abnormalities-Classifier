@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.mlflow_config import (
+from src.mlflow_functions import (
     get_best_params,
     get_best_run,
     get_converted_params,
