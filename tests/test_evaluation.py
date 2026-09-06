@@ -3,9 +3,9 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
-from src.evaluation import evaluate_model, plot_charts, save_and_log_charts
+from src.evaluation_metrics import evaluate_model, plot_charts, save_and_log_charts
 
-from src import evaluation
+from src import evaluation_metrics
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def fake_project_root(tmp_path, monkeypatch):
     fake_file = tmp_path / "project" / "src" / "evaluation.py"
     fake_file.parent.mkdir(parents=True)
     fake_file.touch()
-    monkeypatch.setattr(evaluation, "__file__", str(fake_file))
+    monkeypatch.setattr(evaluation_metrics, "__file__", str(fake_file))
     return fake_file.parent.parent  # .../project
 
 
@@ -24,7 +24,7 @@ def mock_chart_functions(monkeypatch):
             "visualize_confusion_matrix", "plot_roc_curve",
             "plot_pr_curve", "plot_class_pie", "plot_model_comparison",
     ):
-        monkeypatch.setattr(evaluation, name, MagicMock(return_value=fake_fig))
+        monkeypatch.setattr(evaluation_metrics, name, MagicMock(return_value=fake_fig))
     return fake_fig
 
 
@@ -79,7 +79,7 @@ def test_plot_charts_returns_all_five_figures(
     assert set(result) == {
         "cm_fig", "roc_fig", "pr_fig", "class_pie_fig", "model_comparison_fig",
     }
-    evaluation.plot_model_comparison.assert_called_once_with(
+    evaluation_metrics.plot_model_comparison.assert_called_once_with(
         {"rfc": 0.8, "svc": 0.75}
     )
 
@@ -102,7 +102,7 @@ def test_save_and_log_charts_writes_and_logs_one_artifact_per_chart(
     scores_path.write_text(json.dumps({"rfc": 0.8}))
 
     mock_log_artifact = MagicMock()
-    monkeypatch.setattr(evaluation.mlflow, "log_artifact", mock_log_artifact)
+    monkeypatch.setattr(evaluation_metrics.mlflow, "log_artifact", mock_log_artifact)
 
     y_test, y_pred = y_true_pred
     scores = np.random.RandomState(0).rand(len(y_test))
@@ -120,7 +120,7 @@ def test_save_and_log_charts_creates_charts_directory(
     scores_path = fake_project_root / "artifacts" / "scores" / "f1_scores.json"
     scores_path.parent.mkdir(parents=True)
     scores_path.write_text(json.dumps({"rfc": 0.8}))
-    monkeypatch.setattr(evaluation.mlflow, "log_artifact", MagicMock())
+    monkeypatch.setattr(evaluation_metrics.mlflow, "log_artifact", MagicMock())
 
     y_test, y_pred = y_true_pred
     scores = np.random.RandomState(0).rand(len(y_test))
