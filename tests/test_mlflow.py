@@ -11,8 +11,8 @@ from src.mlflow_functions import (
 )
 
 
-@patch("src.mlflow_config.mlflow.log_param")
-@patch("src.mlflow_config.mlflow.log_metric")
+@patch("src.mlflow_functions.mlflow.log_param")
+@patch("src.mlflow_functions.mlflow.log_metric")
 def test_log_trial(
     mock_log_metric,
     mock_log_param
@@ -51,8 +51,8 @@ def test_log_trial(
         0.3
     )
 
-@patch("src.mlflow_config.mlflow.log_param")
-@patch("src.mlflow_config.mlflow.log_metric")
+@patch("src.mlflow_functions.mlflow.log_param")
+@patch("src.mlflow_functions.mlflow.log_metric")
 def test_log_ann_trial(
     mock_log_metric,
     mock_log_param
@@ -86,7 +86,7 @@ def test_log_ann_trial(
 
 
 
-@patch("src.mlflow_config.MlflowClient")
+@patch("src.mlflow_functions.MlflowClient")
 def test_get_best_run(mock_client):
 
     mock_client_instance = mock_client.return_value
@@ -122,7 +122,7 @@ def test_get_best_run(mock_client):
         max_results=1
     )
 
-@patch("src.mlflow_config.MlflowClient")
+@patch("src.mlflow_functions.MlflowClient")
 def test_get_best_run_experiment_not_found(mock_client):
 
     mock_client_instance = mock_client.return_value
@@ -138,7 +138,7 @@ def test_get_best_run_experiment_not_found(mock_client):
             "SVC_optimization"
         )
 
-@patch("src.mlflow_config.get_best_run")
+@patch("src.mlflow_functions.get_best_run")
 def test_get_best_params(mock_get_best_run):
 
     mock_run = MagicMock()
@@ -167,7 +167,7 @@ def test_get_best_params(mock_get_best_run):
         "SVC_optimization"
     )
 
-@patch("src.mlflow_config.get_best_params")
+@patch("src.mlflow_functions.get_best_params")
 def test_get_converted_params_svc(mock_get_best_params):
 
     mock_get_best_params.return_value = {
@@ -191,7 +191,7 @@ def test_get_converted_params_svc(mock_get_best_params):
 
     assert params["kernel"] == "rbf"
 
-@patch("src.mlflow_config.get_best_params")
+@patch("src.mlflow_functions.get_best_params")
 def test_get_converted_params_logistic_regression(
     mock_get_best_params
 ):
@@ -216,7 +216,7 @@ def test_get_converted_params_logistic_regression(
     assert params["C"] == 1.5
     assert params["random_state"] == 42
 
-@patch("src.mlflow_config.get_best_params")
+@patch("src.mlflow_functions.get_best_params")
 def test_get_converted_params_random_forest(
     mock_get_best_params
 ):
@@ -237,7 +237,7 @@ def test_get_converted_params_random_forest(
     assert isinstance(params["max_depth"], int)
     assert isinstance(params["min_samples_split"], int)
 
-@patch("src.mlflow_config.get_best_params")
+@patch("src.mlflow_functions.get_best_params")
 def test_get_converted_params_naive_bayes(
     mock_get_best_params
 ):
@@ -259,7 +259,7 @@ def test_get_converted_params_naive_bayes(
 
     assert params["var_smoothing"] == 0.000001
 
-@patch("src.mlflow_config.get_best_params")
+@patch("src.mlflow_functions.get_best_params")
 def test_get_converted_params_xgb(
     mock_get_best_params
 ):
@@ -284,7 +284,7 @@ def test_get_converted_params_xgb(
     assert isinstance(params["scale_pos_weight"], float)
     assert isinstance(params["learning_rate"], float)
 
-@patch("src.mlflow_config.MlflowClient")
+@patch("src.mlflow_functions.MlflowClient")
 def test_get_best_run_no_runs(mock_client):
 
     mock_client_instance = mock_client.return_value

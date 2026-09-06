@@ -3,9 +3,9 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
-from src.evaluation_metrics import evaluate_model, plot_charts, save_and_log_charts
 
 from src import evaluation_metrics
+from src.evaluation_metrics import evaluate_model, plot_charts, save_and_log_charts
 
 
 @pytest.fixture

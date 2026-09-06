@@ -10,7 +10,8 @@ from src.model import Classifier, NeuralNetwork
 
 def test_preprocessing_and_model(large_dataset):
     X_train, X_test, y_train, y_test, _, _, _ = get_preprocessed_data(
-        large_dataset
+        large_dataset,
+        smote_ratio = 0.3
     )
 
     classifier = Classifier("LogisticRegression")
@@ -32,7 +33,7 @@ def test_preprocessing_and_ann(large_dataset):
     # models (see ann_feature_selection's docstring), so the ANN integration
     # test exercises that path rather than the RFECV-based one above.
     X_train, X_test, y_train, y_test, _, _, _ = (
-        get_preprocessed_data_non_linear(large_dataset)
+        get_preprocessed_data_non_linear(large_dataset, smote_ratio = 0.3)
     )
 
     network = NeuralNetwork(X_train.shape[1])
