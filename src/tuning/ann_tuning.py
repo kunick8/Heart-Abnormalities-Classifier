@@ -1,21 +1,23 @@
+import os
+import sys
+
 import mlflow
+import numpy as np
 import optuna
 import tensorflow as tf
-import sys
-import os
-import numpy as np
-from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import f1_score
-from sklearn.utils.class_weight import compute_class_weight
 from imblearn.over_sampling import SMOTE
+from sklearn.metrics import f1_score
+from sklearn.model_selection import StratifiedKFold
+from sklearn.utils.class_weight import compute_class_weight
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
+from src.data.data_preprocessing import ann_feature_selection, feature_scaling
 from src.mlflow_functions import log_ann_trial, setup_mlflow
 from src.model import NeuralNetwork
-from src.data.data_preprocessing import feature_scaling, ann_feature_selection
+
 
 def objective(trial, X_train, y_train):
 

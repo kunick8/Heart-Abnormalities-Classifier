@@ -1,7 +1,8 @@
 import json
 from pathlib import Path
-import streamlit as st
+
 import plotly.io as pio
+import streamlit as st
 
 project_root = Path(__file__).parent.parent
 metrics_path = project_root / "artifacts" / "model" / "metrics.json"

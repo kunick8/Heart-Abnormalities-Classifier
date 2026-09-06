@@ -47,6 +47,78 @@ Based on these results I've decided to go with Random Forest for the final class
 
 ## File structure
 
+```
+.
+├── README.md
+├── app
+│   ├── home_page.py
+│   ├── model_performance.py
+│   ├── overview.py
+│   ├── predict_page.py
+│   └── streamlit_app.py
+├── artifacts
+│   ├── charts
+│   │   ├── class_pie.json
+│   │   ├── confusion_matrix.json
+│   │   ├── model_comparison.json
+│   │   ├── precision_recall_curve.json
+│   │   └── roc_curve.json
+│   ├── model
+│   │   ├── metrics.json
+│   │   ├── rfc.joblib
+│   │   ├── scaler.joblib
+│   │   └── selector.joblib
+│   └── scores
+│       ├── accuracy_scores.json
+│       └── f1_scores.json
+├── data
+│   └── raw
+│       ├── SPECTF.names
+│       ├── SPECTF.test
+│       └── SPECTF.train
+├── mlflow.db
+├── poetry.lock
+├── poetry.toml
+├── pyproject.toml
+├── src
+│   ├── __init__.py
+│   ├── data
+│   │   ├── __init__.py
+│   │   ├── data_cleaning.py
+│   │   ├── data_extractor.py
+│   │   └── data_preprocessing.py
+│   ├── evaluation_metrics.py
+│   ├── evaluation_pipeline.py
+│   ├── main.py
+│   ├── mlflow.db
+│   ├── mlflow_functions.py
+│   ├── model.py
+│   ├── model_comparison.py
+│   ├── predict.py
+│   ├── tuning
+│   │   ├── __init__.py
+│   │   ├── ann_evaluation.py
+│   │   ├── ann_tuning.py
+│   │   ├── model_evaluation.py
+│   │   └── tune.py
+│   └── visualization
+│       ├── __init__.py
+│       ├── charts.py
+│       └── optuna_charts.py
+└── tests
+    ├── __init__.py
+    ├── conftest.py
+    ├── test_data_cleaning.py
+    ├── test_evaluation.py
+    ├── test_integration.py
+    ├── test_mlflow.py
+    ├── test_model.py
+    ├── test_predict.py
+    └── test_preprocessing.py
+
+
+```
+
 ## How to run the project
 
 ### Option 1 - run the local hosted site with charts, interpretations and predictions
@@ -167,4 +239,16 @@ streamlit run app/streamlit_app.py
 All set, your browser should automatically open the local hosted site, if not then copy the url from the terminal
 
 
-## wnioski i interpretacja po ang xd
+## Conclusions
+
+Building the model on such a scarce dataset led to many more issues than I've anticipated,
+but these issues led to me learning about SMOTE resampling and hyperparameter tuning.
+
+Thanks to this project I now better understand the metrics used to evaluate
+classification models, using Optuna, Mlflow and Streamlit, structuring projects,
+creating CI tests and pipelines, SRC and OOP.
+
+## Still TO-DO
+- [ ] Optimize the models using F1 balanced for the normal class
+- [ ] Research how I can improve the model further
+- [ ] Refactor few functions to make them more universal and simpler

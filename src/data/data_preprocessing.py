@@ -1,14 +1,10 @@
-import pandas as pd
-import xgboost as xgb
 import numpy as np
+import xgboost as xgb
+from imblearn.over_sampling import SMOTE
 from sklearn.feature_selection import RFECV, SelectFromModel
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from imblearn.over_sampling import SMOTE
-
-
-
 
 
 def data_splitter(dataset):
@@ -87,7 +83,7 @@ def get_preprocessed_data(dataset, smote_ratio = None):
             smote,
             selector)
 
-def get_preprocessed_data_non_linear (dataset, n_features:int = None, smote_ratio = None):
+def get_preprocessed_data_non_linear (dataset, n_features:int | None = None, smote_ratio = None):
     X, y = data_splitter(dataset)
     X_train, X_test, y_train, y_test = training_test_split(X, y)
     X_train, X_test, scaler = feature_scaling(X_train, X_test)

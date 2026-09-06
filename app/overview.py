@@ -1,7 +1,7 @@
-import streamlit as st
-import json
-import plotly.io as pio
 from pathlib import Path
+
+import plotly.io as pio
+import streamlit as st
 
 project_root = Path(__file__).parent.parent
 charts_dir = project_root / "artifacts" / "charts"

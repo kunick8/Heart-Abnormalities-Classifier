@@ -4,9 +4,8 @@ from pathlib import Path
 from src.data.data_cleaning import join_data
 from src.data.data_extractor import extract_data
 from src.model_comparison import compare_trained_models
-from src.tuning.model_evaluation import evaluate_models
 from src.tuning.ann_evaluation import evaluate_ann
-
+from src.tuning.model_evaluation import evaluate_models
 
 project_root = Path(__file__).parent.parent
 scores_dir = project_root / "artifacts" / "scores"

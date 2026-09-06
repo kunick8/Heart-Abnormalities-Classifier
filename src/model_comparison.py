@@ -1,11 +1,14 @@
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
+from sklearn.metrics import accuracy_score, f1_score
 from sklearn.utils.class_weight import compute_class_weight
 
-from src.data.data_preprocessing import get_preprocessed_data_non_linear, get_preprocessed_data
-from src.mlflow_functions import  get_converted_params
+from src.data.data_preprocessing import (
+    get_preprocessed_data,
+    get_preprocessed_data_non_linear,
+)
+from src.mlflow_functions import get_converted_params
 from src.model import Classifier, NeuralNetwork
-from sklearn.metrics import accuracy_score, f1_score
 
 
 def compare_trained_models(dataset, models:list):
@@ -32,8 +35,7 @@ def compare_trained_models(dataset, models:list):
         f1_scores[model] = model_f1_score
         accuracy_scores[model] = accuracy_score(y_test, y_pred)
 
-        if model_f1_score > best_f1_score:
-            best_f1_score = model_f1_score
+        best_f1_score = max(best_f1_score, model_f1_score)
 
 
     params, smote_ratio = get_converted_params("http://localhost:5000",'ANN_optimization')

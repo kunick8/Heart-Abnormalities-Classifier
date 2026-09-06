@@ -11,86 +11,68 @@ from src.model import Classifier, NeuralNetwork
 
 
 def test_logistic_regression_creation():
-
     classifier = Classifier("LogisticRegression")
 
     params = {
         "C": 1.0,
         "solver": "lbfgs",
-        "max_iter": 1000
+        "max_iter": 1000,
     }
 
     model = classifier.create_model(params)
 
-    assert isinstance(
-        model,
-        LogisticRegression
-    )
+    assert isinstance(model, LogisticRegression)
+
 
 def test_random_forest_creation():
-
-    classifier = Classifier(
-        "RandomForestClassifier"
-    )
+    classifier = Classifier("RandomForestClassifier")
 
     params = {
         "n_estimators": 100,
-        "max_depth": 10
+        "max_depth": 10,
     }
 
     model = classifier.create_model(params)
 
-    assert isinstance(
-        model,
-        RandomForestClassifier
-    )
+    assert isinstance(model, RandomForestClassifier)
+
 
 def test_naive_bayes_creation():
-
     classifier = Classifier("NaiveBayes")
 
     model = classifier.create_model({})
 
-    assert isinstance(
-        model,
-        GaussianNB
-    )
+    assert isinstance(model, GaussianNB)
+
 
 def test_svc_creation():
-
     classifier = Classifier("SVC")
 
     params = {
         "C": 1.0,
         "kernel": "rbf",
-        "gamma": "scale"
+        "gamma": "scale",
     }
 
     model = classifier.create_model(params)
 
-    assert isinstance(
-        model,
-        SVC
-    )
+    assert isinstance(model, SVC)
+
 
 def test_xgb_creation():
-
     classifier = Classifier("XGBClassifier")
 
     params = {
         "n_estimators": 100,
-        "max_depth": 3
+        "max_depth": 3,
     }
 
     model = classifier.create_model(params)
 
-    assert isinstance(
-        model,
-        XGBClassifier
-    )
+    assert isinstance(model, XGBClassifier)
+
 
 def test_invalid_model_name():
-
     classifier = Classifier("SomethingInvalid")
 
     with pytest.raises(ValueError):
@@ -104,13 +86,13 @@ def test_neural_network_creation():
 
     assert isinstance(model, tf.keras.Sequential)
 
-def test_add_dense_layer():
 
+def test_add_dense_layer():
     nn = NeuralNetwork(32)
 
     params = {
         "units": 32,
-        "activation": "relu"
+        "activation": "relu",
     }
 
     nn.add_dense_layer(**params)
@@ -118,20 +100,20 @@ def test_add_dense_layer():
     model = nn.get_model()
 
     assert len(model.layers) == 1
-
     assert model.layers[0].units == 32
     assert model.layers[0].activation.__name__ == "relu"
+
 
 def test_output_layer():
     nn = NeuralNetwork(32)
 
     params = {
         "units": 32,
-        "activation": "relu"
+        "activation": "relu",
     }
 
     nn.add_dense_layer(**params)
-    nn.add_dense_layer(units=1, activation='sigmoid')
+    nn.add_dense_layer(units=1, activation="sigmoid")
 
     model = nn.get_model()
 
@@ -139,60 +121,96 @@ def test_output_layer():
     assert model.layers[-1].units == 1
     assert model.layers[-1].activation.__name__ == "sigmoid"
 
+
 def test_neural_network_compile():
     nn = NeuralNetwork(32)
 
     params = {
         "units": 32,
-        "activation": "relu"
+        "activation": "relu",
     }
 
     nn.add_dense_layer(**params)
-    nn.add_dense_layer(units=1, activation='sigmoid')
+    nn.add_dense_layer(units=1, activation="sigmoid")
 
-    optimizer = tf.keras.optimizers.Adam(
-        learning_rate=0.001
-    )
-    optimizer_params = {'optimizer': optimizer}
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+    optimizer_params = {"optimizer": optimizer}
     nn.compile(optimizer_params)
 
     model = nn.get_model()
 
     assert model.optimizer is not None
-    assert model.loss == 'binary_crossentropy'
+    assert model.loss == "binary_crossentropy"
+
 
 def test_neural_network_fit():
     np.random.seed(42)
     X = np.random.rand(20, 5)
-
-    y = np.array(
-        [0, 1] * 10
-    )
+    y = np.array([0, 1] * 10)
 
     nn = NeuralNetwork(5)
 
     params = {
         "units": 5,
-        "activation": "relu"
+        "activation": "relu",
     }
 
     nn.add_dense_layer(**params)
-    nn.add_dense_layer(units=1, activation='sigmoid')
+    nn.add_dense_layer(units=1, activation="sigmoid")
 
-    optimizer = tf.keras.optimizers.Adam(
-        learning_rate=0.001
-    )
-    optimizer_params = {'optimizer': optimizer}
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+    optimizer_params = {"optimizer": optimizer}
     nn.compile(optimizer_params)
 
     history = nn.fit(
-        X,
-        y,
+        X, y,
         validation_data=(X, y),
         epochs=1,
-        batch_size=4
+        batch_size=4,
     )
 
     assert history is not None
     assert "loss" in history.history
     assert "accuracy" in history.history
+
+
+# --- Additional coverage ---------------------------------------------------
+
+def test_xgb_random_state_is_forwarded():
+    classifier = Classifier("XGBClassifier")
+    model = classifier.create_model({"n_estimators": 50, "random_state": 7})
+    assert model.get_params()["random_state"] == 7
+
+
+def test_logistic_regression_defaults_are_overridable():
+    classifier = Classifier("LogisticRegression")
+    model = classifier.create_model({"C": 0.5, "class_weight": "balanced"})
+    assert model.get_params()["C"] == 0.5
+    assert model.get_params()["class_weight"] == "balanced"
+
+
+def test_neural_network_supports_multiple_hidden_layers():
+    nn = NeuralNetwork(10)
+    nn.add_dense_layer(units=16, activation="relu")
+    nn.add_dense_layer(units=8, activation="relu")
+    nn.add_dense_layer(units=1, activation="sigmoid")
+
+    model = nn.get_model()
+
+    assert len(model.layers) == 3
+    assert [layer.units for layer in model.layers] == [16, 8, 1]
+
+
+def test_neural_network_predict_returns_probabilities_in_unit_interval():
+    np.random.seed(0)
+    X = np.random.rand(10, 4)
+
+    nn = NeuralNetwork(4)
+    nn.add_dense_layer(units=4, activation="relu")
+    nn.add_dense_layer(units=1, activation="sigmoid")
+    nn.compile({"optimizer": tf.keras.optimizers.Adam(learning_rate=0.001)})
+
+    preds = nn.predict(X)
+
+    assert preds.shape == (10, 1)
+    assert np.all((preds >= 0) & (preds <= 1))

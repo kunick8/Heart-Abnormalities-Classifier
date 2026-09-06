@@ -1,5 +1,6 @@
-import joblib
 from pathlib import Path
+
+import joblib
 
 from src.data.data_cleaning import join_data
 from src.data.data_extractor import extract_data
@@ -7,7 +8,6 @@ from src.data.data_preprocessing import get_preprocessed_data_non_linear
 from src.evaluation_metrics import evaluate_model, save_and_log_charts
 from src.mlflow_functions import get_converted_params
 from src.model import Classifier
-
 
 current_dir = Path(__file__).parent
 model_dir = current_dir.parent / "artifacts" / "model"

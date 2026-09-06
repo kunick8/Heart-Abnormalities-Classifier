@@ -20,7 +20,7 @@ def visualize_confusion_matrix(cm):
         color_continuous_scale="Greens",
         x=labels,
         y=labels,
-        labels=dict(x="Predicted label", y="True label", color="Proportion"),
+        labels={'x':"Predicted label", 'y':"True label", 'color':"Proportion"},
         title="Normalized Confusion Matrix"
     )
 
@@ -52,14 +52,14 @@ def plot_roc_curve(y_test, scores):
         x=fpr, y=tpr,
         mode='lines',
         name=f'Model ROC (AUC = {auc_score:.3f})',
-        line=dict(width=3, color='blue')
+        line={'width':3, 'color':'blue'}
     ))
 
     fig.add_trace(go.Scatter(
         x=[0, 1], y=[0, 1],
         mode='lines',
         name='Random Classifier',
-        line=dict(dash='dash', color='gray')
+        line={'dash':'dash', 'color':'gray'}
     ))
 
     fig.update_layout(
@@ -67,8 +67,8 @@ def plot_roc_curve(y_test, scores):
         xaxis_title="False Positive Rate",
         yaxis_title="True Positive Rate",
         hovermode="x unified",
-        xaxis=dict(range=[-0.01, 1.0]),
-        yaxis=dict(range=[0.0, 1.05])
+        xaxis={'range':[-0.01, 1.0]},
+        yaxis={'range':[0.0, 1.05]}
     )
     return fig
 
@@ -84,7 +84,7 @@ def plot_pr_curve(y_test, scores):
         y=precision,
         mode='lines',
         name=f'Model PR (AP = {ap_score:.3f})',
-        line=dict(width=3, color='purple')
+        line={'width':3, 'color':'purple'}
     ))
 
     fig.add_trace(go.Scatter(
@@ -92,7 +92,7 @@ def plot_pr_curve(y_test, scores):
         y=[baseline, baseline],
         mode='lines',
         name=f'Random Classifier (Baseline = {baseline:.3f})',
-        line=dict(dash='dash', color='gray')
+        line={'dash':'dash', 'color':'gray'}
     ))
 
     fig.update_layout(
@@ -100,8 +100,8 @@ def plot_pr_curve(y_test, scores):
         xaxis_title="Recall (True Positive Rate)",
         yaxis_title="Precision (Positive Predictive Value)",
         hovermode="x unified",
-        xaxis=dict(range=[0.0, 1.0]),
-        yaxis=dict(range=[0.0, 1.05])
+        xaxis={'range':[0.0, 1.0]},
+        yaxis={'range':[0.0, 1.05]}
     )
 
     return fig
@@ -120,7 +120,7 @@ def plot_class_pie(y_train, y_test):
         values=values,
         textinfo='label+percent',
         insidetextorientation='radial',
-        marker=dict(colors=['#ff9999', '#99ff99'])
+        marker={'colors':['#ff9999', '#99ff99']}
     )])
 
     fig.update_layout(
