@@ -13,7 +13,7 @@ K- fold cross validation algorithm.
 
 
 ## Structure 
-data extraction -> data cleaning -> train test split -> feature scaling -> feature elimination -> classification -> kfold to choose model -> model to choose hyperparameters -> deployment
+data extraction -> data cleaning -> train test split -> feature scaling -> SMOTE resampling -> feature elimination -> classification -> Kfold and hyperparameter tuning to choose model -> model training -> deployment
 
 
 ## Model Selection
