@@ -98,6 +98,7 @@ def get_preprocessed_data_non_linear (dataset, n_features:int = None, smote_rati
             y_train,
             y_test,
             scaler,
+            smote,
             selector)
 
 

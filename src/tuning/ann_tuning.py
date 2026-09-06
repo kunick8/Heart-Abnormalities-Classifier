@@ -1,11 +1,17 @@
 import mlflow
 import optuna
 import tensorflow as tf
+import sys
+import os
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import f1_score
 from sklearn.utils.class_weight import compute_class_weight
 from imblearn.over_sampling import SMOTE
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
 from src.mlflow_functions import log_ann_trial, setup_mlflow
 from src.model import NeuralNetwork
@@ -127,7 +133,7 @@ def tune_ann(
     y_train,
     n_trials=100
 ):
-    setup_mlflow(experiment_name="ANN_keras_optimization")
+    setup_mlflow(experiment_name="ANN_optimization")
     study = optuna.create_study(direction="maximize", study_name="ANN_optimization")
 
     study.optimize(lambda trial: objective(trial, X_train, y_train), n_trials=n_trials)

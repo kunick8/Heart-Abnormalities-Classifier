@@ -32,7 +32,7 @@ col1.metric("F1 Score", f"{metrics['f1_score']:.3f}")
 col2.metric("Accuracy", f"{metrics['accuracy']:.3f}")
 col3.metric("Precision", f"{metrics['precision']:.3f}")
 col4.metric("Recall", f"{metrics['recall']:.3f}")
-col5.metric("Roc-auc", f"{metrics['roc_auc_score']:.3f}")
+col5.metric("F1 Score (Macro)", f"{metrics['f1_score_macro']:.3f}")
 
 st.divider()
 
@@ -47,7 +47,7 @@ with chart_col1:
 
 with text_col1:
     st.subheader('Interpretation')
-    st.write("The SVC model turned out to be the best option based on F1 score, it outperformed all other options, I've used F1 score as the standard for model performance because the classes are highly imbalanced and F1 score takes that into account.")
+    st.write("The Random Forest model turned out to be the best option based on F1 score(macro), it outperformed all other options, I've used macro F1 score as the standard for model performance because the classes are highly imbalanced and the macro F1 score takes that into account.")
 
 st.divider()
 
@@ -62,8 +62,18 @@ with chart_col2:
 
 with text_col2:
     st.subheader('Interpretation')
-    st.write("The Confusion Matrix successfully classified 35% of normal cases as normal which is worrying as it opted for the 'easy' approach where it classifies the case as abnormal when in doubt."
-             " on a more positive note, it led to the model accurately classifying 89% of abnormal cases")
+    st.write(
+        '''
+        The Model correctly classified 65% of normal cases and 91% of abnormal cases.
+        #### Impact of False Positives:   
+        The patient gets misdiagnosed with a potential heart abnormality, which may bring the patient a lot of stress.   
+        #### Impact of False Negatives:
+        The Patient is not diagnosed with an actual condition, the health of the patient may be in danger.
+        
+        #### Conclusion:   
+        The balance is acceptable at this point but it would be beneficial to bring down the False Positive Rate
+        '''
+    )
 
 st.divider()
 
@@ -78,7 +88,18 @@ with chart_col3:
 
 with text_col3:
     st.subheader('Interpretation')
-    st.write("The ROC curve depicts that the model performs much better than random guessing, the AUC is in the 'good model' range, ")
+    st.write('''The Model achieved a ROC-AUC of 0.86, meaning there is an 87% chance the model will correctly rank 
+    a randomly chosen positive observation higher than a randomly chosen negative one. The curve shoots straight up at
+    the start, that means the Model can correctly classify 45% of abnormal cases before returning first false alarms.   
+    The curve then starts plateauing around the 82% TPR, in order to catch the remaining 18% of abnormal cases,
+    the model would classify need to classify 76% of normal cases as abnormal.  
+    To catch 82% of abnormal cases, the curve shows we must accept a 24% False Positive Rate, which means that 24% of 
+    all normal cases will be classified as abnormal. Depending on the operational cost of reviewing false alarms, it
+    could be beneficial to select a stricter threshold on the lower-left portion of the curve.
+    
+    
+    '''
+             )
 
 st.divider()
 
@@ -93,6 +114,18 @@ with chart_col4:
 
 with text_col4:
     st.subheader('Interpretation')
-    st.write("Your precision-recall interpretation goes here...")
+    st.write('''
+    Since the dataset consists of abnormal cases in 79%, a random model would have a horizontal baseline at a precision 
+    of 0.79.
+    The model achieved an average Precision of 0.96, demonstrating it performs significantly better than random 
+    guessing at identifying the target class.   
+    The curve remains relatively flat at 87% precision until we reach a recall of 88%. After this point, 
+    attempting to capture the remaining 12% of positive cases causes precision to plummet rapidly.  
+    To ensure a doctor doesn't worry about false positives, we should operate at the left side of the curve, accepting
+    a lower Recall of 91% to maintain a high Precision of 90%. When the model flags an abnormal case the doctor should 
+    trust that verdict. Such split would mean that 91% of cases classified as abnormal are correct but 9% of abnormal 
+    cases are not classified correctly.
+    
+    ''')
 
 st.divider()

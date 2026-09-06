@@ -8,7 +8,6 @@ from sklearn.metrics import (
     f1_score,
     precision_score,
     recall_score,
-    roc_auc_score,
 )
 
 from src.visualization.charts import (
@@ -30,7 +29,7 @@ def evaluate_model(y_test, y_pred):
     'precision': precision_score(y_test, y_pred),
     'recall': recall_score(y_test, y_pred),
     'f1_score': f1_score(y_test, y_pred),
-    'roc_auc_score': roc_auc_score(y_test, y_pred)
+    'f1_score_macro': f1_score(y_test, y_pred, average='macro'),
     }
 
     with open(metrics_path, "w") as f:
@@ -39,12 +38,8 @@ def evaluate_model(y_test, y_pred):
     return metrics
 
 
-def plot_charts(X_test, y_test, y_pred, model):
+def plot_charts(y_test, y_pred, scores):
 
-    if hasattr(model, "decision_function"):
-        scores = model.decision_function(X_test)
-    else:
-        scores = model.predict_proba(X_test)[:, 1]
     cm = confusion_matrix(y_test, y_pred)
     cm_fig = visualize_confusion_matrix(cm)
     roc_fig = plot_roc_curve(y_test, scores)
@@ -70,8 +65,8 @@ def plot_charts(X_test, y_test, y_pred, model):
 
 
 
-def save_and_log_charts(X_test, y_test, y_pred, model):
-    results = plot_charts(X_test, y_test, y_pred, model)
+def save_and_log_charts(y_test, y_pred, scores):
+    results = plot_charts(y_test, y_pred, scores)
 
     project_root = Path(__file__).parent.parent
     charts_dir = project_root / "artifacts" / "charts"

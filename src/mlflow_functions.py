@@ -80,6 +80,7 @@ def get_converted_params(tracking_uri, experiment_name):
         params['max_iter'] = int(params['max_iter'])
         params['C'] = float(params['C'])
         params['random_state'] = int(params['random_state'])
+        params['class_weight'] = None if params['class_weight'] == 'None' else params['class_weight']
 
 
     elif experiment_name == 'RandomForestClassifier_optimization':
@@ -87,6 +88,7 @@ def get_converted_params(tracking_uri, experiment_name):
         params['max_depth'] = int(params['max_depth'])
         params['min_samples_split'] = int(params['min_samples_split'])
         params['random_state'] = int(params['random_state'])
+        params['class_weight'] = None if params['class_weight'] == 'None' else params['class_weight']
 
     elif experiment_name == 'NaiveBayes_optimization':
         params['var_smoothing'] = float(params['var_smoothing'])
@@ -103,13 +105,15 @@ def get_converted_params(tracking_uri, experiment_name):
         params['C'] = float(params['C'])
         params['gamma'] = float(params['gamma'])
         params['random_state'] = int(params['random_state'])
+        params['class_weight'] = None if params['class_weight'] == 'None' else params['class_weight']
 
-    elif experiment_name == 'ANN_keras_optimization':
+    elif experiment_name == 'ANN_optimization':
         params['n_layers'] = int(params['n_layers'])
         params['learning_rate'] = float(params['learning_rate'])
         params['batch_size'] = int(params['batch_size'])
         for i in range(params['n_layers']):
             params[f'{i}_layer_neurons'] = int(params[f'{i}_layer_neurons'])
+        params['use_class_weight'] = bool(params['use_class_weight'])
 
     else:
         raise ValueError(

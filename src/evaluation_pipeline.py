@@ -24,11 +24,7 @@ evaluate_models(models=models, dataset=dataset)
 evaluate_ann(dataset)
 
 
-
-
-
-
-f1_scores, accuracy_scores, model = compare_trained_models(dataset,models =models)
+f1_scores, accuracy_scores = compare_trained_models(dataset,models =models)
 
 
 
@@ -38,4 +34,5 @@ with open(scores_dir / "f1_scores.json", "w") as f:
 with open(scores_dir / "accuracy_scores.json", "w") as f:
     json.dump(accuracy_scores, f)
 
-
+print(f1_scores)
+print(accuracy_scores)

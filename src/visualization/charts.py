@@ -1,6 +1,4 @@
-import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
 from sklearn.metrics import (
@@ -35,7 +33,7 @@ def plot_model_comparison(score_per_model:dict):
     fig = px.bar(
         x=models,
         y=scores,
-        labels={'x': 'Models', 'y': 'Mean CV F1'},
+        labels={'x': 'Models', 'y': 'Macro F1'},
         title="Model Performance",
         color=scores,
         color_continuous_scale="Viridis"

@@ -1,11 +1,15 @@
-from src.data.data_cleaning import join_data
-from src.data.data_extractor import extract_data
+import sys
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 from src.data.data_preprocessing import get_optimization_data
 from src.tuning.tune import tune_model
 
-dataset1 = extract_data('../../data/raw/SPECTF.test')
-dataset2 = extract_data('../../data/raw/SPECTF.train')
-dataset = join_data(dataset1, dataset2)
+
+
 def evaluate_models(models, dataset):
 
 

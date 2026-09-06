@@ -3,7 +3,7 @@ import numpy as np
 
 
 def predict(data:np.ndarray):
-    model = joblib.load('artifacts/model/svc.joblib')
+    model = joblib.load('artifacts/model/rfc.joblib')
     scaler = joblib.load('artifacts/model/scaler.joblib')
     selector = joblib.load('artifacts/model/selector.joblib')
 

@@ -1,5 +1,7 @@
 import mlflow
 import numpy as np
+import sys
+import os
 import optuna
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.preprocessing import StandardScaler
@@ -8,6 +10,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectFromModel
 from imblearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
 from src.mlflow_functions import log_trial, setup_mlflow
 from src.model import Classifier

@@ -38,9 +38,11 @@ Data preprocessing
    ->
 Feature scaling
    ->
+SMOTE resampling
+   ->
 Feature selection
    ->
-SVC
+Random Forest Classifier
    ->
 Normal / Abnormal
 
@@ -48,7 +50,7 @@ Normal / Abnormal
 
 ## Final model
 
-SVC - Support vector Machine
+Random Forest Classifier
 
 ## Data Split
 
@@ -70,21 +72,21 @@ st.write(
 
 5 different Machine Learning models and an Artificial Neural Network were trained, optimized and tested to find the best performing one.
 
-The final model was selected based on F1 score and accuracy metrics.
+The final model was selected based on F1 score(macro) and accuracy metrics.
 
 ---
 
 ## Technologies
 
-Python,
-Scikit-learn,
-Optuna,
-MLflow,
-TensorFlow,
-Streamlit,
-Plotly,
-Seaborn,
-XGBoost
+Python, 
+Scikit-learn, 
+Optuna, 
+MLflow, 
+TensorFlow, 
+Streamlit, 
+Plotly, 
+XGBoost, 
+Imblearn
     
     '''
 )
