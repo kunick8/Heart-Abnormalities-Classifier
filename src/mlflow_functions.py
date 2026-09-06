@@ -120,11 +120,8 @@ def get_converted_params(tracking_uri, experiment_name):
             f"Experiment '{experiment_name}' not found"
         )
 
+
     params['smote_ratio'] = float(params['smote_ratio'])
-
-
-
-
 
     params.pop('model', None)
     params.pop('trial_number', None)

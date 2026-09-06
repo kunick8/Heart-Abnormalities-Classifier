@@ -174,10 +174,13 @@ def test_get_converted_params_svc(mock_get_best_params):
         "model": "SVC",
         "C": "2.5",
         "gamma": "0.01",
-        "kernel": "rbf"
+        "kernel": "rbf",
+        'random_state': '42',
+        'class_weight': 'balanced',
+        'smote_ratio': 0.3,
     }
 
-    params = get_converted_params(
+    params, smote_ratio = get_converted_params(
         "http://localhost:5000",
         "SVC_optimization"
     )
@@ -191,6 +194,14 @@ def test_get_converted_params_svc(mock_get_best_params):
 
     assert params["kernel"] == "rbf"
 
+    assert isinstance(params["random_state"], int)
+    assert params["random_state"] == 42
+
+    assert params["class_weight"] == 'balanced'
+
+    assert isinstance(smote_ratio, float)
+    assert smote_ratio == 0.3
+
 @patch("src.mlflow_functions.get_best_params")
 def test_get_converted_params_logistic_regression(
     mock_get_best_params
@@ -200,10 +211,12 @@ def test_get_converted_params_logistic_regression(
         "model": "LogisticRegression",
         "max_iter": "1000",
         "C": "1.5",
-        "random_state": "42"
+        "random_state": "42",
+        'class_weight': 'balanced',
+        'smote_ratio': 0.3,
     }
 
-    params = get_converted_params(
+    params, smote_ratio = get_converted_params(
         "http://localhost:5000",
         "LogisticRegression_optimization"
     )
@@ -215,6 +228,10 @@ def test_get_converted_params_logistic_regression(
     assert params["max_iter"] == 1000
     assert params["C"] == 1.5
     assert params["random_state"] == 42
+    assert params["class_weight"] == 'balanced'
+
+    assert isinstance(smote_ratio, float)
+    assert smote_ratio == 0.3
 
 @patch("src.mlflow_functions.get_best_params")
 def test_get_converted_params_random_forest(
@@ -225,10 +242,13 @@ def test_get_converted_params_random_forest(
         "model": "RandomForestClassifier",
         "n_estimators": "200",
         "max_depth": "20",
-        "min_samples_split": "4"
+        "min_samples_split": "4",
+        'random_state': '42',
+        'class_weight': 'balanced',
+        'smote_ratio': 0.3,
     }
 
-    params = get_converted_params(
+    params, smote_ratio = get_converted_params(
         "http://localhost:5000",
         "RandomForestClassifier_optimization"
     )
@@ -237,6 +257,14 @@ def test_get_converted_params_random_forest(
     assert isinstance(params["max_depth"], int)
     assert isinstance(params["min_samples_split"], int)
 
+    assert isinstance(params["random_state"], int)
+    assert params["random_state"] == 42
+
+    assert params["class_weight"] == 'balanced'
+
+    assert isinstance(smote_ratio, float)
+    assert smote_ratio == 0.3
+
 @patch("src.mlflow_functions.get_best_params")
 def test_get_converted_params_naive_bayes(
     mock_get_best_params
@@ -244,10 +272,11 @@ def test_get_converted_params_naive_bayes(
 
     mock_get_best_params.return_value = {
         "model": "NaiveBayes",
-        "var_smoothing": "0.000001"
+        "var_smoothing": "0.000001",
+        'smote_ratio': 0.3,
     }
 
-    params = get_converted_params(
+    params, smote_ratio = get_converted_params(
         "http://localhost:5000",
         "NaiveBayes_optimization"
     )
@@ -258,6 +287,9 @@ def test_get_converted_params_naive_bayes(
     )
 
     assert params["var_smoothing"] == 0.000001
+
+    assert isinstance(smote_ratio, float)
+    assert smote_ratio == 0.3
 
 @patch("src.mlflow_functions.get_best_params")
 def test_get_converted_params_xgb(
@@ -270,10 +302,12 @@ def test_get_converted_params_xgb(
         "max_depth": "5",
         "min_child_weight": "2",
         "scale_pos_weight": "3.5",
-        "learning_rate": "0.1"
+        "learning_rate": "0.1",
+        'random_state': '42',
+        'smote_ratio': 0.3,
     }
 
-    params = get_converted_params(
+    params, smote_ratio = get_converted_params(
         "http://localhost:5000",
         "XGBClassifier_optimization"
     )
@@ -283,6 +317,12 @@ def test_get_converted_params_xgb(
     assert isinstance(params["min_child_weight"], int)
     assert isinstance(params["scale_pos_weight"], float)
     assert isinstance(params["learning_rate"], float)
+    assert isinstance(params["random_state"], int)
+    assert params["random_state"] == 42
+    assert isinstance(smote_ratio, float)
+    assert smote_ratio == 0.3
+
+
 
 @patch("src.mlflow_functions.MlflowClient")
 def test_get_best_run_no_runs(mock_client):

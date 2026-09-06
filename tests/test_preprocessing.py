@@ -51,7 +51,7 @@ def test_smote_resampling_balances_classes(imbalanced_dataset):
     X, y = data_splitter(imbalanced_dataset)
     X_train, _, y_train, _ = training_test_split(X, y)
 
-    X_res, y_res, _ = smote_resampling(X_train, y_train)
+    X_res, y_res, _ = smote_resampling(X_train, y_train, smote_ratio= 1)
 
     counts = np.bincount(y_res)
     assert counts[0] == counts[1]
